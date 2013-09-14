@@ -363,7 +363,7 @@ var initEventHandlers = function() {
 			maxPrice = 25 * ui.value;
 			update();
 		}
-      }).addSliderSegments($slider.slider("option").max);
+      });
     }
 
         var $slider = $("#rank-slider");
@@ -381,7 +381,7 @@ var initEventHandlers = function() {
 			lowerRank = 100 * ui.value;
 			update();
 		}
-      }).addSliderSegments($slider.slider("option").max);
+      });
     }
 
 
