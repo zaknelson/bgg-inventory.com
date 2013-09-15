@@ -59,7 +59,7 @@ var mouseEventToMarketItemsAndGame = function(event) {
 	var result = {};
 	var rank = Math.round((gameCount() * (event.offsetX - plotPadding)) / getPlotWidth() - .5)
 	var game = games[rank];
-	if (game && isFiltered(game) && event.offsetY  >= plotPadding && event.offsetY <= getPlotHeight() + plotPadding) {
+	if (game && isFiltered(game) && event.offsetY >= plotPadding - getPointRadius() * 1.5 && event.offsetY <= getPlotHeight() + plotPadding + getPointRadius() * 1.5) {
 		if (!areAnyFiltersApplied()) {
 			result.game = game;
 		} else {
@@ -422,7 +422,7 @@ var initSidebar = function() {
 				return false;
 			}
 			updateSliderTooltip(priceSlider, getCurrencySymbol() + (ui.value * 50), ui.value)
-			maxPrice = 25 * ui.value;
+			maxPrice = 50 * ui.value;
 			update();
 		},
 		start: function(event, ui) {
