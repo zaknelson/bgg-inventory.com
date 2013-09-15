@@ -5,11 +5,8 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 	"strings"
-)
-
-const (
-	port = ":8080"
 )
 
 type Page struct {
@@ -67,7 +64,7 @@ func init() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js/"))))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./fonts/"))))
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
-	http.ListenAndServe(port, nil)
+	http.ListenAndServe(":" + os.Getenv("PORT"), nil)
 }
 
 func main() {}
