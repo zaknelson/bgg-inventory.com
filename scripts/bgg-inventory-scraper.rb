@@ -100,8 +100,8 @@ def fetch_top_games game_limit
 end
 
 def main
-	games = fetch_top_games(2)
-	File.open("output/output2.json", "w") { |file| file.write(games.to_json) }
+	games = fetch_top_games(500)
+	File.open("../model/games.json", "w") { |file| file.write(games.to_json) }
 end
 
 main()
