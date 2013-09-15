@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{{.SourceCommentHeader}}
+<html lang="en">
+	<head>
+		<title>{{.Title}}</title>
+		<link href="/css/app.css" rel="stylesheet">
+		<link href="/css/flat-ui.css" rel="stylesheet">
+		<script type="text/javascript" src="//use.typekit.net/lcd2zif.js"></script>
+		<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+	</head>
+	<body>
+		<div class="global-tooltip tooltip">
+			<h4 class="title"></h4>
+		</div>
+		<div class="sidebar">
+			<h1>BoardGameGeek <span class="inventory-header">Inventory</span></h1>
+
+			<div class="section">
+				<input class="search-input" type="text" placeholder="Search..."></input>
+			</div>
+
+			<div class="section">
+				<h2>Rank</h2>
+				<div class="rank-slider ui-slider"></div>
+			</div>
+
+			<div class="section">
+				<h2>Price</h2>
+				<div class="switch" data-on-label="$" data-off-label="€">
+					<input class="currency-switch" type="checkbox" checked ></input>
+				</div>
+				<div class="price-slider ui-slider"></div>
+			</div>
+
+			<div class="section">
+				<h2>Condition</h2>
+				<div class="conditions">
+					<div class="new">
+						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>New</label>
+					</div>
+					<div class="like-new">
+						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Like New</label>
+					</div>
+					<div class="very-good">
+						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Very Good</label>
+					</div>
+					<div class="good">
+						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Good</label>
+					</div>
+					<div class="acceptable">
+						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Acceptable</label>
+					</div>
+				</div>
+			</div>
+			<div class="footer">
+				<div class="links">
+					<a href="" class="twitter-link"><img data-tooltip="Tweet" src="/images/twitter/twitter.png"></img></a>
+					<a href="https://www.gittip.com/zaknelson/"><img data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
+					<a href="https://github.com/zaknelson/bgg-inventory"><img data-tooltip="Code" src="/images/github/github.png"></img></a>
+				</div>
+			</div>
+		</div>
+		<div class="content">
+			<canvas class="plot"></canvas>
+			<div class="x-axis">
+				<h3 class="x-label">Rank</h3>
+			</div>
+			<div class="y-axis">
+				<h3 class="y-label rotate">Price</h3>
+			</div>
+			<div class="tooltip">
+				<a class="title-link" target="_blank"><h2 class="title"></h2></a>
+				<p class="categories"></p>
+				<!--<p class="price-range"></p>-->
+				<p class="prices"></p>
+			</div>
+		</div>
+		<script src="/js/jquery-1.8.3.min.js"></script>
+		<script src="/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="/js/jquery.ui.touch-punch.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/bootstrap-switch.js"></script>
+		<script src="/js/flatui-checkbox.js"></script>
+		<script src="/js/app.js"></script>
+	</body>
+</html>

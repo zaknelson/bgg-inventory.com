@@ -421,8 +421,8 @@ textarea {
   font-size: 14px;
 }
 a {
-  color: #16a085;
-  text-decoration: underline;
+  color: #444;
+  text-decoration: none;
   -webkit-transition: 0.25s;
   -moz-transition: 0.25s;
   -o-transition: 0.25s;
