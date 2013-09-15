@@ -430,8 +430,8 @@ a {
   -webkit-backface-visibility: hidden;
 }
 a:hover {
-  color: #1abc9c;
-  text-decoration: none;
+  color: #444;
+  text-decoration: underline;
 }
 h1 {
   font-size: 32px;

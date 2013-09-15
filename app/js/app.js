@@ -71,11 +71,6 @@ var mouseEventToMarketItemsAndGame = function(event) {
 				}
 			}
 		}
-
-		//if (result.game) {
-			//console.log((-point.y + plotPadding + getPlotHeight()) / getPlotHeight() * highestPrice);
-			//console.log(result.game)
-		//}
 	}
 	return result;
 };
@@ -252,7 +247,6 @@ var update = function(event) {
 					entry.push(marketItem)
 				}
 				var orderedConditions = ["new", "likenew", "verygood", "good", "acceptable"];
-				console.log(marketItemsByCondition)
 				for (var i = 0; i < orderedConditions.length; i++) {
 					var marketItems = marketItemsByCondition[orderedConditions[i]];
 					if (!marketItems) {
@@ -262,7 +256,7 @@ var update = function(event) {
 					for (var j = 0; j < marketItems.length; j++) {
 						var marketItem = marketItems[j];
 						var separator = j !==  marketItems.length - 1 ? ", " : "";
-						div.append($('<a href="' + marketItem.link + '" target="_blank"><span style="color:' + getColorForCondition(marketItem.condition, true) + '">' + Math.round(marketItem.price.value) + separator + '</span></a>"'));
+						div.append($('<span style="color:' + getColorForCondition(marketItem.condition, true) + '"><a style="color:' + getColorForCondition(marketItem.condition, true) + '" href="' + marketItem.link + '" target="_blank">' + Math.round(marketItem.price.value) + '</a>' + separator + '</span>'));
 					}
 					
 				}
