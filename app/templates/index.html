@@ -3,6 +3,7 @@
 <html lang="en">
 	<head>
 		<title>{{.Title}}</title>
+		<meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
 		<link href="/css/app.css" rel="stylesheet">
 		<link href="/css/flat-ui.css" rel="stylesheet">
 		<script type="text/javascript" src="//use.typekit.net/lcd2zif.js"></script>
@@ -63,15 +64,17 @@
 		<div class="content">
 			<canvas class="plot"></canvas>
 			<div class="x-axis">
+				<div class="x-ticks"></div>
 				<h3 class="x-label">Rank</h3>
 			</div>
 			<div class="y-axis">
+				<div class="y-ticks"></div>
 				<h3 class="y-label rotate">Price</h3>
 			</div>
 			<div class="tooltip">
 				<a class="title-link" target="_blank"><h2 class="title"></h2></a>
 				<p class="categories"></p>
-				<!--<p class="price-range"></p>-->
+				<p class="current-prices-text"><a>Current Prices</a></p>
 				<p class="prices"></p>
 			</div>
 		</div>

@@ -1,104 +1,85 @@
 var plot = $(".plot");
 var plotContext = plot[0].getContext("2d");
 
+// constants
 var plotPadding = 40;
+var mouseOverRadiusScale = 1.5;
+var minRadiusSize = 5;
+var orderedConditions = ["new", "likenew", "verygood", "good", "acceptable"];
 
-var allGames = [];
+// model
 var games = [];
-var highestPrice = 100;
 var mousedOverGame = null;
 var clickedGame = null;
+var pointRadius = 5;
+var plotWidth = 500;
+var plotHeight = 500;
+var lastPoint = null;
 
 // filters
 var searchQuery = null;
 var maxPrice = 50;
-var upperRank = 1;
-var lowerRank = 100;
+var maxRank = 100;
 var currency = "USD";
+var currencySymbol = "$";
 var conditions = {"new": true, "likenew": true, "verygood": true, "good": true, "acceptable": true};
 var categories = {};
 
-var gameCount = function() {
-	return lowerRank - upperRank + 1;
+var eventToPoint = function(event) {
+	if (!event) {
+		return null;
+	}
+	event = event.originalEvent;
+	var point = {};
+	if (event.touches) {
+		point.x = event.touches[0].pageX - parseInt($(".content").css("left"));
+		point.y = event.touches[0].pageY;
+	} else {
+		point.x = event.offsetX; 
+		point.y = event.offsetY;
+	}
+	return point;
 };
 
-var getPlotWidth = function() {
-	return plot.attr("width") - plotPadding * 2;
+var pointToGame = function(point) {
+	if (!point) {
+		return null;
+	}
+	var rank = Math.round((maxRank * (point.x - plotPadding)) / plotWidth - .5)
+	var game = games[rank];
+	if (game && 
+		point.y >= plotPadding - pointRadius * mouseOverRadiusScale && 
+		point.y <= plotHeight + plotPadding + pointRadius * mouseOverRadiusScale) {
+		for (var i = 0; i < game.market_items.length; i++) {
+			if (isFiltered(game, game.market_items[i])) {
+				return game;
+			}
+		}
+	}
+	return null;;
 };
 
-var getPlotHeight = function() {
-	return plot.attr("height") - plotPadding * 2;
-};
-
-var getPointRadius = function() {
-	// TODO maybe cache this?
-	return (getPlotWidth() / (gameCount() * 2));
-};
-
-var getCurrencySymbol = function() {
-	return currency === "USD" ? "$" : "€";
+var getFilteredMarketItems = function(game) {
+	var marketItems = [];
+	for (var i = 0; i < game.market_items.length; i++) {
+		var marketItem = game.market_items[i];
+		if (isFiltered(game, marketItem)) {
+			marketItems.push(marketItem);
+		}
+	}
+	return marketItems;
 };
 
 var marketItemToPoint = function(game, marketItem) {
 	var point = {};
-	point.x = ((game.rank - .5) / gameCount()) * getPlotWidth() + plotPadding;
-	point.y = getPlotHeight() - (marketItem.price.value / maxPrice) * getPlotHeight() + plotPadding;
+	point.x = ((game.rank - .5) / maxRank) * plotWidth + plotPadding;
+	point.y = plotHeight - (marketItem.price.value / maxPrice) * plotHeight + plotPadding;
 	return point;
 };
 
-var areAnyFiltersApplied = function() {
-	return searchQuery || 
-		!$('.conditions .new input').is(":checked")  || 
-		!$('.conditions .like-new input').is(":checked")  ||
-		!$('.conditions .very-good input').is(":checked")  ||
-		!$('.conditions .good input').is(":checked")  ||
-		!$('.conditions .acceptable input').is(":checked") ;
-};
-
-var mouseEventToMarketItemsAndGame = function(event) {
-	var result = {};
-	var rank = Math.round((gameCount() * (event.offsetX - plotPadding)) / getPlotWidth() - .5)
-	var game = games[rank];
-	if (game && isFiltered(game) && event.offsetY >= plotPadding - getPointRadius() * 1.5 && event.offsetY <= getPlotHeight() + plotPadding + getPointRadius() * 1.5) {
-		if (!areAnyFiltersApplied()) {
-			result.game = game;
-		} else {
-			for (var i = 0; i < game.market_items.length; i++) {
-				var marketItem = game.market_items[i];
-				if (isFiltered(game, marketItem)) {
-					result.game = game;
-					break;
-				}
-			}
-		}
-	}
-	return result;
-};
-
-var drawPoint = function(point, color, radius) {
-	plotContext.beginPath();
-	plotContext.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
-	plotContext.fillStyle = color;
-	plotContext.fill();
-};
-
-var drawMarketItem = function(event, game, marketItem) {
-	var point = marketItemToPoint(game, marketItem)
-	if (mousedOverGame) { // one game is moused over, display it only
-		var isSelected = mousedOverGame === game;
-		drawPoint(point, getColorForCondition(marketItem.condition, isSelected), isSelected ? Math.max(getPointRadius() * 1.5, 7) : getPointRadius());
-	} else if (	event && 
-				event.offsetX > plotPadding && event.offsetX < plot.width() - plotPadding && 
-				event.offsetY > plotPadding && event.offsetY < plot.height() - plotPadding) { // mouse is inside the plot, but no game is moused over
-		drawPoint(point, getColorForCondition(marketItem.condition, false), getPointRadius());
-	} else {
-		drawPoint(point, getColorForCondition(marketItem.condition, true), getPointRadius());
-	}
-};
-
-var getColorForCondition = function(condition, isSelected) {
-	var color = "#000"
-	var opactity = isSelected ? "1.0" : "0.15"
+var conditionToColor = function(condition, isBright) {
+	var color = null;
+	var opactity = isBright ? "1.0" : "0.15"
 	switch(condition) {
 		case "new":
 			color = "rgba(52, 73, 94, " + opactity + ")"
@@ -121,17 +102,40 @@ var getColorForCondition = function(condition, isSelected) {
 	return color;
 };
 
+var drawPoint = function(point, color, radius) {
+	plotContext.beginPath();
+	plotContext.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
+	plotContext.fillStyle = color;
+	plotContext.fill();
+};
+
+var drawMarketItem = function(point, game, marketItem) {
+	var marketItemPoint = marketItemToPoint(game, marketItem);
+	if (mousedOverGame) { // one game is moused over, display it only
+		var isSelected = mousedOverGame === game;
+		var radius = isSelected ? Math.max(pointRadius * mouseOverRadiusScale, minRadiusSize) : pointRadius;
+		var color = conditionToColor(marketItem.condition, isSelected);
+		drawPoint(marketItemPoint, color, radius);
+	} else if (	point && 
+				point.x > plotPadding && point.x < plotWidth + plotPadding && 
+				point.y > plotPadding && point.y < plotHeight + plotPadding) { // mouse is inside the plot, but no game is moused over
+		var color = conditionToColor(marketItem.condition, false);
+		drawPoint(marketItemPoint, color, pointRadius);
+	} else { // mousse is outside the plot
+		var color = conditionToColor(marketItem.condition, true);
+		drawPoint(marketItemPoint, color, pointRadius);
+	}
+};
+
 var doesGameContainSubstring = function(game, substring) {
 	var substringParts = substring.toLowerCase().match(/\S+/g);
 	var gameNameParts = game.name.toLowerCase().match(/\S+/g);
 	for (var i = 0; i < substringParts.length; i++) {
 		var substringPart = substringParts[i];
-		
 		var foundMatch = false;
 		for (var j = 0; j < gameNameParts.length; j++) {
-
 			var gameNamePart = gameNameParts[j];
-			if (gameNamePart.slice(0, substringPart.length) === substringPart) { //does the part start with the substring?
+			if (gameNamePart.slice(0, substringPart.length) === substringPart) { //does the game name start with the substring?
 				foundMatch = true;
 				break;
 			}
@@ -144,15 +148,31 @@ var doesGameContainSubstring = function(game, substring) {
 };
 
 var isFiltered = function(game, marketItem) {
-	return (game.rank >= upperRank && game.rank <= lowerRank &&
+	return (game.rank <= maxRank &&
 		(!marketItem ||
-			(marketItem.price.value < maxPrice && 
-			marketItem.price.currency == currency &&
+			(marketItem.price.value <= maxPrice && 
+			marketItem.price.currency === currency &&
 			conditions[marketItem.condition])) &&
-		(!searchQuery || doesGameContainSubstring(game, $(".search-input").val())));
+		(!searchQuery || doesGameContainSubstring(game, searchQuery)));
 };
 
-var drawPlot = function(event) {
+var drawAxisLabels = function() {
+	$(".x-ticks").empty();
+	$(".y-ticks").empty();
+	for (var i = 0; i < 5; i++) {
+		var xTick = $('<div class="x-tick">#' + (i + 1) * maxRank / 5 + '</div>');
+		xTick.css("left", plotPadding + plotWidth / 5 * (i + 1) - 15);
+		$(".x-ticks").append(xTick);
+
+		var yTick = $('<div class="y-tick">' + currencySymbol + (i + 1) * maxPrice / 5 + '</div>');
+		yTick.css("top", plotHeight + plotPadding - plotHeight / 5 * (i + 1) - 5);
+		$(".y-ticks").append(yTick);
+	}
+	
+};
+
+var drawPlot = function(point) {
+	drawAxisLabels();
 	plot.attr("width", plot.width());
 	plot.attr("height", plot.height());
 	plotContext.clearRect (0, 0, plot.width(), plot.height());
@@ -161,126 +181,99 @@ var drawPlot = function(event) {
 		for (var j = 0; j < game.market_items.length; j++) {
 			var marketItem = game.market_items[j];
 			if (isFiltered(game, marketItem)) {
-				drawMarketItem(event, game, marketItem);
-			}
-			if (marketItem.price.currency == currency &&
-				conditions[marketItem.condition]) {
-				
+				drawMarketItem(point, game, marketItem);
 			}
 		}
 	}
 };
 
-var setPriceRanges = function() {
-	for (var i = 0; i < games.length; i++) {
-		var game = games[i];
-		game.priceRange = {};
-		for (var j = 0; j < game.market_items.length; j++) {
-			var marketItem = game.market_items[j];
-			var price = marketItem.price.value;
-			if (!game.priceRange.min || price < game.priceRange.min) {
-				game.priceRange.min = price;
-			}
-			if (!game.priceRange.max || price > game.priceRange.max) {
-				game.priceRange.max = price;
-			}
+var updateTooltipPrices = function(tooltip) {
+	var priceList = tooltip.find(".prices");
+	priceList.empty();
+
+	var marketItems = getFilteredMarketItems(clickedGame);
+	marketItems.sort(function(a, b) {
+		return a.price.value - b.price.value;
+	});
+
+	var marketItemsByCondition = {};
+	for (var i = 0; i < marketItems.length; i++) {
+		var marketItem = marketItems[i];
+		var arr = marketItemsByCondition[marketItem.condition];
+		if (!arr) {
+			arr = [];
+			marketItemsByCondition[marketItem.condition] = arr;
 		}
+		arr.push(marketItem)
+	}
+
+	for (var i = 0; i < orderedConditions.length; i++) {
+		var marketItemsForCondition = marketItemsByCondition[orderedConditions[i]];
+		if (!marketItemsForCondition) {
+			continue;
+		}
+		var div = $("<div></div>")
+		for (var j = 0; j < marketItemsForCondition.length; j++) {
+			var marketItem = marketItemsForCondition[j];
+			var separator = j !== marketItemsForCondition.length - 1 ? ", " : "";
+			var color = conditionToColor(marketItem.condition, true);
+			var link = $('<a style="color:' + color + '" href="' + marketItem.link + '" target="_blank">' + Math.round(marketItem.price.value) + "</a>");
+			var span = $('<span style="color:' + color + '"></span>');
+			span.append(link);
+			span.append(separator);
+			div.append(span);
+		}
+		priceList.append(div);
+	}
+}
+
+var showPlotTooltip = function(point) {
+	var tooltip = $(".content .tooltip");
+	var game = mousedOverGame || clickedGame;
+	if (game) {
+		tooltip.find(".title").html("#" + game.rank + " " + game.name);
+		tooltip.find(".categories").html(game.categories.join(", "));
+		if (clickedGame) {
+			tooltip.css("pointer-events", "auto");
+			tooltip.find(".current-prices-text").show();
+			tooltip.find(".current-prices-text a").attr("href", "http://boardgamegeek.com/geekstore.php3?action=listforsale&gameid=" + game.id);
+			tooltip.find(".title-link").attr("href", "http://boardgamegeek.com/boardgame/" + game.id);
+			updateTooltipPrices(tooltip);
+		} else {
+			tooltip.find(".current-prices-text").hide();
+			tooltip.css("pointer-events", "none");
+			tooltip.find(".prices").empty();
+		}
+		tooltip.css("top", Math.min(point.y - 40, plot.height() - tooltip.height() - 40) + "px");
+		tooltip.css("left", Math.min(plot.width() - 400 - 35, point.x + 20) + "px");
+		tooltip.show();
+	} else {
+		tooltip.hide();
 	}
 };
 
-var getGames = function() {
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "/api/v1/games", true);
-	xhr.onload = function (e) {
-		if (xhr.readyState === 4) {
-			if (xhr.status === 200) {
-				games = JSON.parse(xhr.responseText);
-				setPriceRanges();
-				drawPlot();
-			} else {
-				console.error(xhr.statusText);
-			}
-		}
-	};
-	xhr.onerror = function (e) {
-		console.error(xhr.statusText);
-	};
-	xhr.send(null);
-};
+var update = function(point) {
+	plotWidth = plot.width() - plotPadding * 2;
+	plotHeight = plot.height() - plotPadding * 2;
+	pointRadius = (plotWidth / (maxRank * 2));
+	lastPoint = point;
 
-var update = function(event) {
-	if (!event) {
+	if (!point) {
 		mousedOverGame = null;
 		clickedGame = null;
 		$(".content .tooltip").hide();
 	} else {
-		var mousedOver = mouseEventToMarketItemsAndGame(event);
-		mousedOverGame = mousedOver.game || clickedGame;
-		var tooltip = $(".content .tooltip");
-		if (mousedOverGame) {
-
-			tooltip.find(".title").html("#" + mousedOverGame.rank + " " + mousedOverGame.name);
-			tooltip.find(".categories").html(mousedOverGame.categories.join(", "));
-			if (clickedGame) {
-				tooltip.css("pointer-events", "auto");
-				tooltip.find(".title-link").attr("href", "http://boardgamegeek.com/boardgame/" + mousedOverGame.id);
-				var currencySymbol = getCurrencySymbol();
-				var priceList = tooltip.find(".prices");
-				var marketItems = [];
-				for (var i = 0; i < clickedGame.market_items.length; i ++) {
-					var marketItem = clickedGame.market_items[i];
-					if (isFiltered(clickedGame, marketItem)) {
-						marketItems.push(marketItem);
-					}
-				}
-				marketItems.sort(function(a, b) {
-					return a.price.value - b.price.value;
-				});
-				var marketItemsByCondition = {};
-				for (var i = 0; i < marketItems.length; i++) {
-					var marketItem = marketItems[i];
-					var entry = marketItemsByCondition[marketItem.condition];
-					if (!entry) {
-						entry = [];
-						marketItemsByCondition[marketItems[i].condition] = entry;
-					}
-					entry.push(marketItem)
-				}
-				var orderedConditions = ["new", "likenew", "verygood", "good", "acceptable"];
-				tooltip.find(".prices").empty();
-				for (var i = 0; i < orderedConditions.length; i++) {
-					var marketItems = marketItemsByCondition[orderedConditions[i]];
-					if (!marketItems) {
-						continue;
-					}
-					var div = priceList.append($("<div>"));
-					for (var j = 0; j < marketItems.length; j++) {
-						var marketItem = marketItems[j];
-						var separator = j !==  marketItems.length - 1 ? ", " : "";
-						div.append($('<span style="color:' + getColorForCondition(marketItem.condition, true) + '"><a style="color:' + getColorForCondition(marketItem.condition, true) + '" href="' + marketItem.link + '" target="_blank">' + Math.round(marketItem.price.value) + '</a>' + separator + '</span>'));
-					}
-					
-				}
-				//tooltip.find(".price-range").html(getCurrencySymbol() + Math.round(clickedGame.priceRange.min) + " - " + currencySymbol + Math.round(clickedGame.priceRange.max));
-			} else {
-				tooltip.css("pointer-events", "none");
-				tooltip.find(".prices").empty();
-				//tooltip.find(".price-range").html("");
-			}
-			if (event.offsetY + tooltip.height() > plot.height()) {
-				tooltip.css("top", plot.height() - tooltip.height() - 35 + "px");
-			} else {
-				tooltip.css("top", event.offsetY - 35 + "px");
-			}
-			
-			tooltip.css("left", Math.min(plot.width() - tooltip.width() - 35, event.offsetX + 20) + "px");
-			tooltip.show();
-		} else {
-			tooltip.hide();
-		}
+		showPlotTooltip(point);
 	}
 
-	drawPlot(event);
+	drawPlot(point);
+};
+
+var initGames = function() {
+	$.getJSON("/api/v1/games", function(data) {
+		games = data;
+		update();
+	});
 };
 
 var initWindowResizeHandler = function() {
@@ -288,7 +281,7 @@ var initWindowResizeHandler = function() {
 	window.onresize = function(){
 		clearTimeout(resizeTimeoutId);
 		resizeTimeoutId = setTimeout(function() {
-			drawPlot();
+			update();
 		}, 50);
 	};
 };
@@ -297,56 +290,48 @@ var initKeyHandlers = function() {
 	$(window.document).keydown(function(event) {
 		if (event.keyCode === 27) { // ESC
 			update();
-		} else if (event.keyCode === 37) { // left arrow
-			if (!clickedGame) {
-				return;
-			}
+		} else if (event.keyCode === 37 && clickedGame) { // left arrow
 			var startingIndex = clickedGame.rank;
-			var i = startingIndex - 2 < 0 ? lowerRank - 1 : startingIndex - 2;
+			var i = startingIndex - 2;
+			i = (i < 0) ? maxRank : i;
 			var done = false;
 			while (i !== startingIndex && !done) {
 				var game = games[i];
-				for (var j = 0; j < game.market_items.length; j++) {
-					var marketItem = game.market_items[j];
-					if (isFiltered(game, marketItem)) {
-						clickedGame = game;
-						var fakeEvent = {};
-						fakeEvent.offsetY = getPlotHeight() / 2;
-						fakeEvent.offsetX = marketItemToPoint(game, marketItem).x
-						update(fakeEvent);
-						done = true;
-						break;
-					}
+				if (getFilteredMarketItems(game).length) {
+					mousedOverGame = game;
+					clickedGame = game;
+					var point = marketItemToPoint(game, game.market_items[0]);
+					point.y = lastPoint.y;
+					update(point);
+					done = true;
+					break;
 				}
 				i--;
 				if (i === -1) {
-					i = lowerRank;
+					i = maxRank;
 				}
 			}
-		} else if (event.keyCode === 39) { // right arrow
-			if (!clickedGame) {
-				return;
-			}
-			var startingIndex = clickedGame ? clickedGame.rank : upperRank - 1;
-			var i = startingIndex < 0 ? upperRank - 1 : startingIndex;
+		} else if (event.keyCode === 39 && clickedGame) { // right arrow
+			var startingIndex = clickedGame.rank
+			var i = startingIndex;
 			var done = false;
 			while (i !== startingIndex-1 && !done) {
 				var game = games[i];
 				for (var j = 0; j < game.market_items.length; j++) {
 					var marketItem = game.market_items[j];
-					if (isFiltered(game, marketItem)) {
+					if (getFilteredMarketItems(game).length) {
+						mousedOverGame = game;
 						clickedGame = game;
-						var fakeEvent = {};
-						fakeEvent.offsetY = getPlotHeight() / 2;
-						fakeEvent.offsetX = marketItemToPoint(game, marketItem).x
-						update(fakeEvent);
+						var point = marketItemToPoint(game, game.market_items[0]);
+						point.y = lastPoint.y;
+						update(point);
 						done = true;
 						break;
 					}
 				}
 				i++;
-				if (i === lowerRank + 1) {
-					i = upperRank - 1;
+				if (i === maxRank + 1) {
+					i = 0;
 				}
 			}
 		}
@@ -356,25 +341,42 @@ var initKeyHandlers = function() {
 var initPlot = function() {
 	plot.on("mousemove mouseout", function(event) {
 		if (!clickedGame) {
-			update(event);
+			var point = eventToPoint(event);
+			mousedOverGame = pointToGame(point);
+			update(point);
 		}
+	});
+
+	plot.on("touchmove touchleave touchstart", function(event) {
+		var point = eventToPoint(event);
+		clickedGame = pointToGame(point);
+		mousedOverGame = clickedGame;
+		update(point);
+		event.preventDefault();
+	});
+
+	$(".sidebar").click(function(event) {
+		clickedGame = null;
+		update();
 	});
 
 	plot.click(function(event) {
 		if (clickedGame) {
 			clickedGame = null;
 			update();
-			return;
-		}
-		var result = mouseEventToMarketItemsAndGame(event);
-		if (result.game) {
-			clickedGame = result.game;
-			update(event);
+		} else {
+			var point = eventToPoint(event);
+			clickedGame = pointToGame(point)
+			update(point);
 		}
 	});
 };
 
 var initSidebar = function() {
+	var tooltip = $(".global-tooltip");
+	var priceSlider = $(".price-slider");
+	var rankSlider = $(".rank-slider");
+
 	$(".search-input").keyup(function() {
 		searchQuery = $(".search-input").val();
 		update();
@@ -391,15 +393,11 @@ var initSidebar = function() {
 
 	$(".currency-switch").change(function(event) {
 		currency = $(".currency-switch").is(":checked") ? "USD" : "EUR";
+		currencySymbol = currency === "USD" ? "$" : "€";
 		update();
 	});
 
-
-	var tooltip = $(".global-tooltip");
-	var priceSlider = $(".price-slider");
-	var rankSlider = $(".rank-slider");
-
-	var updateSliderTooltip = function(slider, str, value) {
+	var showSliderTooltip = function(slider, str, value) {
 		// TODO, why is this necessary?
 		var offset = -10;
 		if (value === 5) {
@@ -414,20 +412,20 @@ var initSidebar = function() {
 	priceSlider.slider({
 		min: 0,
 		max: 5,
-		value: 2,
+		value: 1,
 		orientation: "horizontal",
 		range: "min",
 		slide: function(event, ui) {
 			if (ui.value === 0) {
 				return false;
 			}
-			updateSliderTooltip(priceSlider, getCurrencySymbol() + (ui.value * 50), ui.value)
+			showSliderTooltip(priceSlider, currencySymbol + (ui.value * 50), ui.value)
 			maxPrice = 50 * ui.value;
 			update();
 		},
 		start: function(event, ui) {
 			var currencySymbol = currency === "USD" ? "$" : "€";
-			updateSliderTooltip(priceSlider, currencySymbol + (ui.value * 50), ui.value)
+			showSliderTooltip(priceSlider, currencySymbol + (ui.value * 50), ui.value)
 		},
 		stop: function(event, ui) {
 			tooltip.hide();
@@ -443,12 +441,12 @@ var initSidebar = function() {
 			if (ui.value === 0) {
 				return false;
 			}
-			updateSliderTooltip(rankSlider, ui.value * 100, ui.value);
-			lowerRank = 100 * ui.value;
+			showSliderTooltip(rankSlider, ui.value * 100, ui.value);
+			maxRank = 100 * ui.value;
 			update();
 		},
 		start: function(event, ui) {
-			updateSliderTooltip(rankSlider, ui.value * 100, ui.value);
+			showSliderTooltip(rankSlider, ui.value * 100, ui.value);
 		},
 		stop: function(event, ui) {
 			tooltip.hide();
@@ -459,17 +457,8 @@ var initSidebar = function() {
 	});
 };
 
-var initSidebarTooltip = function() {
-	$(".footer .links img").mousemove(function(event) {
-		
-	});
-	$(".footer .links img").mouseout(function(event) {
-		$(".footer .tooltip").hide();
-	});
-};
-
 var main = function() {
-	getGames();
+	initGames();
 	initSidebar();
 	initPlot();
 	initWindowResizeHandler();

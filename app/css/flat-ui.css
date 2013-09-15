@@ -1959,7 +1959,7 @@ textarea[class*="span"] {
   filter: unquote("progid:DXImageTransform.Microsoft.gradient(enabled = false)");
 }
 .ui-slider-handle {
-  background-color: #16a085;
+  background-color: #34495e;
   border-radius: 50%;
   cursor: pointer;
   height: 18px;
@@ -1979,14 +1979,14 @@ textarea[class*="span"] {
 }
 .ui-slider-handle:hover,
 .ui-slider-handle:focus {
-  background-color: #48c9b0;
+  background-color: #34495e;
   outline: none;
 }
 .ui-slider-handle:active {
-  background-color: #16a085;
+  background-color: #34495e;
 }
 .ui-slider-range {
-  background-color: #1abc9c;
+  background-color: #3d556e;
   border-radius: 30px 0 0 30px;
   display: block;
   height: 100%;
