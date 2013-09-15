@@ -47,15 +47,20 @@ class Game < JSONable
 	attr_accessor :name
 	attr_accessor :rank
 	attr_accessor :market_items
+	attr_accessor :categories
 
 	def self.parse_game_from_xml xml
 		game = Game.new
 		game.id = xml.css('item')[0].attr("id")
 		game.name = xml.css('name[type="primary"]')[0].attr("value")
 		game.market_items = []
+		game.categories = []
 		xml.css("marketplacelistings > listing").each do |listing|
 			market_item = MarketItem.parse_market_item_from_xml(listing)
 			game.market_items.push(market_item)
+		end
+		xml.css('link[type="boardgamecategory"]').each do |category|
+			game.categories.push(category.attr("value"));
 		end
 		game
 	end
