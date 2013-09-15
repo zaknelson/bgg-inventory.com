@@ -247,6 +247,7 @@ var update = function(event) {
 					entry.push(marketItem)
 				}
 				var orderedConditions = ["new", "likenew", "verygood", "good", "acceptable"];
+				tooltip.find(".prices").empty();
 				for (var i = 0; i < orderedConditions.length; i++) {
 					var marketItems = marketItemsByCondition[orderedConditions[i]];
 					if (!marketItems) {
@@ -297,7 +298,10 @@ var initKeyHandlers = function() {
 		if (event.keyCode === 27) { // ESC
 			update();
 		} else if (event.keyCode === 37) { // left arrow
-			var startingIndex = clickedGame ? clickedGame.rank : lowerRank + 1;
+			if (!clickedGame) {
+				return;
+			}
+			var startingIndex = clickedGame.rank;
 			var i = startingIndex - 2 < 0 ? lowerRank - 1 : startingIndex - 2;
 			var done = false;
 			while (i !== startingIndex && !done) {
@@ -320,6 +324,9 @@ var initKeyHandlers = function() {
 				}
 			}
 		} else if (event.keyCode === 39) { // right arrow
+			if (!clickedGame) {
+				return;
+			}
 			var startingIndex = clickedGame ? clickedGame.rank : upperRank - 1;
 			var i = startingIndex < 0 ? upperRank - 1 : startingIndex;
 			var done = false;
@@ -448,7 +455,7 @@ var initSidebar = function() {
 		}});
 
 	$(".twitter-link").click(function() {
-		window.open("https://twitter.com/intent/tweet?text=bgg-inventory.com: A visualization of games being sold on BoardGameGeek - @_zaknelson", "", "height=400,width=800");
+		window.open("https://twitter.com/intent/tweet?text=bgg-inventory.com - A visualization of games being sold on BoardGameGeek by @_zaknelson", "", "height=400,width=800");
 	});
 };
 
