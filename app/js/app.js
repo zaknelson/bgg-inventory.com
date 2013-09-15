@@ -272,9 +272,13 @@ var update = function(event) {
 				tooltip.find(".prices").empty();
 				//tooltip.find(".price-range").html("");
 			}
+			if (event.offsetY + tooltip.height() > plot.height()) {
+				tooltip.css("top", plot.height() - tooltip.height() - 35 + "px");
+			} else {
+				tooltip.css("top", event.offsetY - 35 + "px");
+			}
 			
-			tooltip.css("top", event.offsetY - 35 + "px");
-			tooltip.css("left", Math.min(plot.width() - tooltip.width() - 50, event.offsetX + 20) + "px");
+			tooltip.css("left", Math.min(plot.width() - tooltip.width() - 35, event.offsetX + 20) + "px");
 			tooltip.show();
 		} else {
 			tooltip.hide();
