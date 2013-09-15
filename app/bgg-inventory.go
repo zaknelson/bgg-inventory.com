@@ -49,7 +49,7 @@ func serveSingle(pattern string, filename string) {
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	page := new(Page)
-	page.Title = "BoardGameGeek Price Index"
+	page.Title = "BoardGameGeek Inventory"
 	page.SourceCommentHeader = template.HTML("<!-- https://github.com/zaknelson/bgg-prices/ -->")
 
 	t := template.New("index")
