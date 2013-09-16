@@ -227,7 +227,7 @@ var updateTooltipPrices = function(tooltip) {
 	}
 }
 
-var showPlotTooltip = function(point) {
+var showPlotTooltip = function(point, touch) {
 	var tooltip = $(".content .tooltip");
 	var game = mousedOverGame || clickedGame;
 	if (game) {
@@ -244,7 +244,13 @@ var showPlotTooltip = function(point) {
 			tooltip.css("pointer-events", "none");
 			tooltip.find(".prices").empty();
 		}
-		tooltip.css("top", Math.min(point.y - 40, plot.height() - tooltip.height() - 40) + "px");
+
+		if (touch) {
+			tooltip.css("top", plot.height() / 5 + "px");
+		} else {
+			tooltip.css("top", Math.min(point.y - 40, plot.height() - tooltip.height() + touchOffset - 40) + "px");
+		}
+		
 		tooltip.css("left", Math.min(plot.width() - 400 - 35, point.x + 20) + "px");
 		tooltip.show();
 	} else {
@@ -252,7 +258,7 @@ var showPlotTooltip = function(point) {
 	}
 };
 
-var update = function(point) {
+var update = function(point, touch) {
 	plotWidth = plot.width() - plotPadding * 2;
 	plotHeight = plot.height() - plotPadding * 2;
 	pointRadius = (plotWidth / (maxRank * 2));
@@ -263,7 +269,7 @@ var update = function(point) {
 		clickedGame = null;
 		$(".content .tooltip").hide();
 	} else {
-		showPlotTooltip(point);
+		showPlotTooltip(point, touch);
 	}
 
 	drawPlot(point);
@@ -351,7 +357,7 @@ var initPlot = function() {
 		var point = eventToPoint(event);
 		clickedGame = pointToGame(point);
 		mousedOverGame = clickedGame;
-		update(point);
+		update(point, true);
 		event.preventDefault();
 	});
 
