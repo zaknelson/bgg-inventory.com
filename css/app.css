@@ -18,6 +18,10 @@ input:focus {
 	-webkit-appearance:none;
 }
 
+a, img {
+	border:none;
+}
+
 .rotate {
 	-webkit-transform: rotate(-90deg);
 	-moz-transform: rotate(-90deg);
