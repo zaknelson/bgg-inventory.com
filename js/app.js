@@ -35,8 +35,8 @@ var eventToPoint = function(event) {
 		point.x = event.touches[0].pageX - parseInt($(".content").css("left"));
 		point.y = event.touches[0].pageY;
 	} else {
-		point.x = event.offsetX; 
-		point.y = event.offsetY;
+		point.x = event.offsetX === undefined ? event.layerX : event.offsetX;
+		point.y = event.offsetY === undefined ? event.layerY : event.offsetY;
 	}
 	return point;
 };
