@@ -189,7 +189,6 @@ input:focus {
 }
 
 .x-axis .x-ticks {
-	margin-top: 5px;
 	height: 20px;
 	width: 100%;
 	overflow: hidden;
