@@ -64,7 +64,8 @@ input:focus {
 }
 
 .sidebar .description {
-	font-size: 14px;
+	margin-top: -15px;
+	font-size: 16px;
 	opacity: .5;
 }
 
