@@ -63,6 +63,11 @@ input:focus {
 	font-size: 55px;
 }
 
+.sidebar .description {
+	font-size: 14px;
+	opacity: .5;
+}
+
 .sidebar .search-input {
 	display: block;
 	margin-left: auto;
@@ -153,7 +158,7 @@ input:focus {
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
-	left: 335px;
+	left: 315px;
 	overflow: hidden;
 }
 
@@ -170,7 +175,7 @@ input:focus {
 }
 
 .x-axis {
-	margin-top: -50px;
+	margin-top: -35px;
 	width: 100%;
 	text-align: center;
 	-moz-box-sizing: border-box;
@@ -180,20 +185,6 @@ input:focus {
 .y-axis {
 	margin-left: -35px;
 	height: 100%;
-}
-
-.x-axis .x-label, .y-axis .y-label {
-	font-size: 24px;
-	opacity: .25;
-}
-
-.y-axis .y-label {
-	position: absolute;
-	top: 47%;
-}
-
-.x-axis .x-label {
-	margin: -5px;
 }
 
 .x-axis .x-ticks {
