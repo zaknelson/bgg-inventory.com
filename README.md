@@ -1,4 +1,4 @@
-[bgg-inventory](http://bgg-inventory)
+[bgg-inventory](http://bgg-inventory.com)
 ==============
 
-A visualization of popular games being sold on BoardGameGeek.com
+A visualization of popular games being sold on [BoardGameGeek.com](http://boardgamegeek.com)
