@@ -248,7 +248,7 @@ var showPlotTooltip = function(point, touch) {
 		if (touch) {
 			tooltip.css("top", plot.height() / 5 + "px");
 		} else {
-			tooltip.css("top", Math.min(point.y - 40, plot.height() - tooltip.height() + touchOffset - 40) + "px");
+			tooltip.css("top", Math.min(point.y - 40, plot.height() - tooltip.height() - 40) + "px");
 		}
 		
 		tooltip.css("left", Math.min(plot.width() - 400 - 35, point.x + 20) + "px");
