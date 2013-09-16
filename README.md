@@ -1,4 +1,4 @@
-bgg-inventory
+[bgg-inventory](http://bgg-inventory)
 ==============
 
-A graphical representation of games being sold on BoardGameGeek's marketplace.
+A visualization of popular games being sold on BoardGameGeek.com
