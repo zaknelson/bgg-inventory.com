@@ -2,7 +2,7 @@ var plot = $(".plot");
 var plotContext = plot[0].getContext("2d");
 
 // constants
-var plotPadding = 40;
+var plotPadding = 50;
 var mouseOverRadiusScale = 1.5;
 var minRadiusSize = 5;
 var orderedConditions = ["new", "likenew", "verygood", "good", "acceptable"];
@@ -18,7 +18,9 @@ var lastPoint = null;
 
 // filters
 var searchQuery = null;
+var minPrice = 0;
 var maxPrice = 50;
+var minRank = 0;
 var maxRank = 100;
 var currency = "USD";
 var currencySymbol = "$";
@@ -45,7 +47,7 @@ var pointToGame = function(point) {
 	if (!point) {
 		return null;
 	}
-	var rank = Math.round((maxRank * (point.x - plotPadding)) / plotWidth - .5)
+	var rank = Math.round(((maxRank - minRank) * (point.x - plotPadding)) / plotWidth - .5) + minRank;
 	var game = games[rank];
 	if (game && 
 		point.y >= plotPadding - pointRadius * mouseOverRadiusScale && 
@@ -72,29 +74,28 @@ var getFilteredMarketItems = function(game) {
 
 var marketItemToPoint = function(game, marketItem) {
 	var point = {};
-	point.x = ((game.rank - .5) / maxRank) * plotWidth + plotPadding;
-	point.y = plotHeight - (marketItem.price.value / maxPrice) * plotHeight + plotPadding;
+	point.x = (game.rank - minRank - .5) / (maxRank - minRank) * plotWidth + plotPadding;
+	point.y = plotHeight - ((marketItem.price.value - minPrice) / (maxPrice - minPrice)) * plotHeight + plotPadding;
 	return point;
 };
 
 var conditionToColor = function(condition, isBright) {
 	var color = null;
-	var opactity = isBright ? "1.0" : "0.15"
 	switch(condition) {
 		case "new":
-			color = "rgba(52, 73, 94, " + opactity + ")"
+			color = isBright ? "rgba(52, 73, 94, 1)" : "#b7bfc6";
 			break;
 		case "likenew":
-			color = "rgba(52, 152, 219, " + opactity + ")"
+			color = isBright ? "rgba(52, 152, 219, 1)" : "#b7dbf2"
 			break;
 		case "verygood":
-			color = "rgba(46, 204, 113, " + opactity + ")"
+			color = isBright ? "rgba(46, 204, 113, 1)" : "#b5edcd";
 			break;
 		case "good":
-			color = "rgba(241, 196, 15, " + opactity + ")"
+			color = isBright ? "rgba(241, 196, 15, 1)" : "#f7e28d";
 			break;
 		case "acceptable":
-			color = "rgba(231, 76, 60, " + opactity + ")"
+			color = isBright ? "rgba(231, 76, 60, 1)" : "#f7c0ba";
 			break;
 		default:
 			break;
@@ -107,24 +108,6 @@ var drawPoint = function(point, color, radius) {
 	plotContext.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
 	plotContext.fillStyle = color;
 	plotContext.fill();
-};
-
-var drawMarketItem = function(point, game, marketItem) {
-	var marketItemPoint = marketItemToPoint(game, marketItem);
-	if (mousedOverGame) { // one game is moused over, display it only
-		var isSelected = mousedOverGame === game;
-		var radius = isSelected ? Math.max(pointRadius * mouseOverRadiusScale, minRadiusSize) : pointRadius;
-		var color = conditionToColor(marketItem.condition, isSelected);
-		drawPoint(marketItemPoint, color, radius);
-	} else if (	point && 
-				point.x > plotPadding && point.x < plotWidth + plotPadding && 
-				point.y > plotPadding && point.y < plotHeight + plotPadding) { // mouse is inside the plot, but no game is moused over
-		var color = conditionToColor(marketItem.condition, false);
-		drawPoint(marketItemPoint, color, pointRadius);
-	} else { // mousse is outside the plot
-		var color = conditionToColor(marketItem.condition, true);
-		drawPoint(marketItemPoint, color, pointRadius);
-	}
 };
 
 var doesGameContainSubstring = function(game, substring) {
@@ -149,8 +132,10 @@ var doesGameContainSubstring = function(game, substring) {
 
 var isFiltered = function(game, marketItem) {
 	return (game.rank <= maxRank &&
+			game.rank >= minRank &&
 		(!marketItem ||
 			(marketItem.price.value <= maxPrice && 
+			marketItem.price.value >= minPrice &&
 			marketItem.price.currency === currency &&
 			conditions[marketItem.condition])) &&
 		(!searchQuery || doesGameContainSubstring(game, searchQuery)));
@@ -159,13 +144,17 @@ var isFiltered = function(game, marketItem) {
 var drawAxisLabels = function() {
 	$(".x-ticks").empty();
 	$(".y-ticks").empty();
-	for (var i = 0; i < 5; i++) {
-		var xTick = $('<div class="x-tick">#' + (i + 1) * maxRank / 5 + '</div>');
-		xTick.css("left", plotPadding + plotWidth / 5 * (i + 1) - 15);
+	for (var i = 0; i < 6; i++) {
+		var rank = (minRank + i * (maxRank - minRank) / 5);
+		rank = rank === 0 ? 1 : rank;
+		var xTick = $('<div class="x-tick">#' + rank + '</div>');
+		xTick.css("left", plotPadding + plotWidth / 5 * i - 15);
 		$(".x-ticks").append(xTick);
 
-		var yTick = $('<div class="y-tick">' + currencySymbol + (i + 1) * maxPrice / 5 + '</div>');
-		yTick.css("top", plotHeight + plotPadding - plotHeight / 5 * (i + 1) - 5);
+
+
+		var yTick = $('<div class="y-tick">' + currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5)  + '</div>');
+		yTick.css("top", plotHeight + plotPadding - plotHeight / 5 * i - 5);
 		$(".y-ticks").append(yTick);
 	}
 	
@@ -176,14 +165,37 @@ var drawPlot = function(point) {
 	plot.attr("width", plot.width());
 	plot.attr("height", plot.height());
 	plotContext.clearRect (0, 0, plot.width(), plot.height());
+	var drawLater = [];
 	for (var i = 0; i < games.length; i++) {
 		var game = games[i];
 		for (var j = 0; j < game.market_items.length; j++) {
 			var marketItem = game.market_items[j];
 			if (isFiltered(game, marketItem)) {
-				drawMarketItem(point, game, marketItem);
+				var marketItemPoint = marketItemToPoint(game, marketItem);
+				if (mousedOverGame) { // one game is moused over, display it only
+					var isSelected = mousedOverGame === game;
+					var radius = isSelected ? Math.max(pointRadius * mouseOverRadiusScale, minRadiusSize) : pointRadius;
+					var color = conditionToColor(marketItem.condition, isSelected);
+					if (isSelected) {
+						drawLater.push({marketItemPoint:marketItemPoint, color:color, radius:radius})
+					} else {
+						drawPoint(marketItemPoint, color, radius);
+					}
+				} else if (	point && 
+							point.x > plotPadding && point.x < plotWidth + plotPadding && 
+							point.y > plotPadding && point.y < plotHeight + plotPadding) { // mouse is inside the plot, but no game is moused over
+					var color = conditionToColor(marketItem.condition, false);
+					drawPoint(marketItemPoint, color, pointRadius);
+				} else { // mouse is outside the plot
+					var color = conditionToColor(marketItem.condition, true);
+					drawPoint(marketItemPoint, color, pointRadius);
+				}
 			}
 		}
+	}
+
+	for (var i = 0; i < drawLater.length; i++) {
+		drawPoint(drawLater[i].marketItemPoint, drawLater[i].color, drawLater[i].radius);
 	}
 };
 
@@ -261,7 +273,7 @@ var showPlotTooltip = function(point, touch) {
 var update = function(point, touch) {
 	plotWidth = plot.width() - plotPadding * 2;
 	plotHeight = plot.height() - plotPadding * 2;
-	pointRadius = (plotWidth / (maxRank * 2));
+	pointRadius = (plotWidth / ((maxRank - minRank) * 2));
 	lastPoint = point;
 
 	if (!point) {
@@ -403,7 +415,7 @@ var initSidebar = function() {
 		update();
 	});
 
-	var showSliderTooltip = function(slider, str, value) {
+	var showSliderTooltip = function(slider, str, value, maxValue) {
 		// TODO, why is this necessary?
 		var offset = -10;
 		if (value === 5) {
@@ -411,27 +423,28 @@ var initSidebar = function() {
 		}
 		tooltip.find(".title").html(str);
 		tooltip.css("top", slider.offset().top - 60 + "px");
-		tooltip.css("left", slider.offset().left + value * slider.width() / 5 - tooltip.width() / 2 + offset + "px");
+		tooltip.css("left", slider.offset().left + value / maxValue * slider.width() - tooltip.width() / 2 + offset + "px");
 		tooltip.show();
 	};
 
 	priceSlider.slider({
 		min: 0,
-		max: 5,
-		value: 1,
+		max: 200,
+		values: [0, 50],
+		step: 5,
+		range: true,
 		orientation: "horizontal",
-		range: "min",
 		slide: function(event, ui) {
-			if (ui.value === 0) {
+			if (ui.values[0] === ui.values[1]) {
 				return false;
 			}
-			showSliderTooltip(priceSlider, currencySymbol + (ui.value * 50), ui.value)
-			maxPrice = 50 * ui.value;
+			showSliderTooltip(priceSlider, currencySymbol + (ui.value), ui.value, 200);
+			minPrice = ui.values[0];
+			maxPrice = ui.values[1];
 			update();
 		},
 		start: function(event, ui) {
-			var currencySymbol = currency === "USD" ? "$" : "€";
-			showSliderTooltip(priceSlider, currencySymbol + (ui.value * 50), ui.value)
+			showSliderTooltip(priceSlider, currencySymbol + ui.value, ui.value, 200)
 		},
 		stop: function(event, ui) {
 			tooltip.hide();
@@ -439,20 +452,22 @@ var initSidebar = function() {
 
 	rankSlider.slider({
 		min: 0,
-		max: 5,
-		value: 1,
+		max: 500,
+		values: [0, 100],
+		step: 50,
 		orientation: "horizontal",
-		range: "min",
+		range: true,
 		slide: function( event, ui ) {
-			if (ui.value === 0) {
+			if (ui.values[0] === ui.values[1]) {
 				return false;
 			}
-			showSliderTooltip(rankSlider, ui.value * 100, ui.value);
-			maxRank = 100 * ui.value;
+			showSliderTooltip(rankSlider, "#" + ui.value, ui.value, 500);
+			minRank = ui.values[0];
+			maxRank = ui.values[1];
 			update();
 		},
 		start: function(event, ui) {
-			showSliderTooltip(rankSlider, ui.value * 100, ui.value);
+			showSliderTooltip(rankSlider, ui.value, ui.value, 500);
 		},
 		stop: function(event, ui) {
 			tooltip.hide();
