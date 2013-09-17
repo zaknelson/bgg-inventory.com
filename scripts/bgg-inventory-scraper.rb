@@ -34,11 +34,15 @@ class MarketItem < JSONable
 	attr_accessor :condition
 
 	def self.parse_market_item_from_xml xml
-		market_item = MarketItem.new
-		market_item.price = Price.parse_price_from_xml(xml.css("price"))
-		market_item.link = xml.css("link").attr("href")
-		market_item.condition = xml.css("condition").attr("value")
-		market_item
+		begin
+			market_item = MarketItem.new
+			market_item.price = Price.parse_price_from_xml(xml.css("price"))
+			market_item.link = xml.css("link").attr("href")
+			market_item.condition = xml.css("condition").attr("value")
+			market_item
+		rescue
+			puts "Errors parsing market item: " + xml
+		end
 	end
 end
 
@@ -72,7 +76,7 @@ def fetch url
 end
 
 def fetch_top_games game_limit
-	print "Fetching top games"
+	print "Fetching top games..."
 	page = 1
 	top_game_ids = []
 	while top_game_ids.length < game_limit
@@ -89,7 +93,7 @@ def fetch_top_games game_limit
 			end
 		end
 		if before_count == top_game_ids.length
-			puts "Error scraping games"
+			puts "Error scraping games: " + doc
 			exit 1
 		end
 		page += 1
