@@ -67,7 +67,7 @@ class Game < JSONable
 end
 
 def fetch url
-	sleep 3
+	sleep 1
 	Nokogiri::HTML(open(url))
 end
 
@@ -78,6 +78,7 @@ def fetch_top_games game_limit
 	while top_game_ids.length < game_limit
 		print "."
 		doc = fetch("http://boardgamegeek.com/browse/boardgame/page/#{page}?sort=rank")
+		before_count = top_game_ids.length
 		doc.css("#row_ a").each do |link|
 			href = link.attr("href")
 			if href and href.start_with?("/boardgame/") and link.content.length > 0
@@ -86,6 +87,10 @@ def fetch_top_games game_limit
 				id = id[0...id.index("/")]
 				top_game_ids.push(id) if not top_game_ids.include?(id)
 			end
+		end
+		if before_count == top_game_ids.length
+			puts "Error scraping games"
+			exit 1
 		end
 		page += 1
 	end
