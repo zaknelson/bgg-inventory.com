@@ -47,7 +47,7 @@ var pointToGame = function(point) {
 	if (!point) {
 		return null;
 	}
-	var rank = Math.round(((maxRank - minRank) * (point.x - plotPadding)) / plotWidth - .5) + minRank;
+	var rank = Math.round(((maxRank - minRank) * (point.x - plotPadding)) / plotWidth - 1.5) + minRank;
 	var game = games[rank];
 	if (game && 
 		point.y >= plotPadding - pointRadius * mouseOverRadiusScale && 
@@ -74,7 +74,7 @@ var getFilteredMarketItems = function(game) {
 
 var marketItemToPoint = function(game, marketItem) {
 	var point = {};
-	point.x = (game.rank - minRank - .5) / (maxRank - minRank) * plotWidth + plotPadding;
+	point.x = (game.rank - minRank + .5) / (maxRank - minRank) * plotWidth + plotPadding;
 	point.y = plotHeight - ((marketItem.price.value - minPrice) / (maxPrice - minPrice)) * plotHeight + plotPadding;
 	return point;
 };
@@ -461,13 +461,13 @@ var initSidebar = function() {
 			if (ui.values[0] === ui.values[1]) {
 				return false;
 			}
-			showSliderTooltip(rankSlider, "#" + ui.value, ui.value, 500);
+			showSliderTooltip(rankSlider, "#" + (ui.value === 0 ? 1 : ui.value), ui.value, 500);
 			minRank = ui.values[0];
 			maxRank = ui.values[1];
 			update();
 		},
 		start: function(event, ui) {
-			showSliderTooltip(rankSlider, ui.value, ui.value, 500);
+			showSliderTooltip(rankSlider, "#" + (ui.value === 0 ? 1 : ui.value), ui.value, 500);
 		},
 		stop: function(event, ui) {
 			tooltip.hide();
