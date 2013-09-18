@@ -15,6 +15,7 @@ var pointRadius = 5;
 var plotWidth = 500;
 var plotHeight = 500;
 var lastPoint = null;
+var isMinimizing = false;
 
 // filters
 var searchQuery = null;
@@ -144,8 +145,9 @@ var isFiltered = function(game, marketItem) {
 		(!searchQuery || doesGameContainSubstring(game, searchQuery)));
 };
 
-var drawAxisLabels = function() {
-	var haveCreatedTicks = false;
+var drawAxisLabels = function(width) {
+	if (isMinimizing) return;
+	width = width || plotWidth;
 	var xTicks = $(".x-tick");
 	var yTicks = $(".y-tick");
 	for (var i = 0; i < 6; i++) {
@@ -153,14 +155,11 @@ var drawAxisLabels = function() {
 		rank = rank === 0 ? 1 : rank;
 		var xTick = $(xTicks[i])
 		xTick.html("#" + rank);
-		xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
-		
+		xTick.css("left", plotPadding + width / 5 * i - 15);
 		var yTick = $(yTicks[i]);
 		yTick.html(currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5));
 		yTick.css("top", plotHeight + plotPadding - plotHeight / 5 * i - 5);
 	}
-
-	haveCreatedTicks = true;
 };
 
 var drawPlot = function(point) {
@@ -377,8 +376,10 @@ var initPlot = function() {
 	});
 
 	$(".sidebar").click(function(event) {
-		clickedGame = null;
-		update();
+		if (clickedGame) {
+			clickedGame = null;
+			update();
+		}
 	});
 
 	plot.click(function(event) {
@@ -485,6 +486,7 @@ var initMinimizeTabs = function() {
 	var isSidebarMinimized = false;
 	var minimizedSize = 50;
 	$(".sidebar .change-size").click(function() {
+		
 		if (isSidebarMinimized) {
 			$(".sidebar .change-size").html("−");
 			$(".sidebar .change-size").css("left", $(".sidebar").outerWidth() - 50);
@@ -492,18 +494,29 @@ var initMinimizeTabs = function() {
 			$(".content").css("left", $(".sidebar").outerWidth());
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
+			drawAxisLabels(plotWidth - $(".sidebar").outerWidth() + 50);
 		} else {
 			$(".sidebar .change-size").html("+");
 			$(".sidebar .change-size").css("left", 0);
 			$(".sidebar").css("margin-left", -$(".sidebar").outerWidth() + minimizedSize);
 			$(".content").css("left", minimizedSize);
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 0);
+			$(".x-tick").addClass("quick-transition");
+			drawAxisLabels(plotWidth + $(".sidebar").outerWidth() - 50);
 		}
+		isMinimizing = true;
+		
+
+		//$(".x-tick").removeClass("quick-transition");
+		//$(".x-tick").css("opacity", 0);
 		setTimeout(function() {
 			update();
 		}, 250);
 		setTimeout(function() {
 			update();
+			//$(".x-tick").addClass("quick-transition");
+			//$(".x-tick").css("opacity", .7);
+			isMinimizing = false;
 		}, 500);
 		isSidebarMinimized = !isSidebarMinimized;
 	});
