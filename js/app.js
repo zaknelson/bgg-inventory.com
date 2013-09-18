@@ -145,22 +145,22 @@ var isFiltered = function(game, marketItem) {
 };
 
 var drawAxisLabels = function() {
-	$(".x-ticks").empty();
-	$(".y-ticks").empty();
+	var haveCreatedTicks = false;
+	var xTicks = $(".x-tick");
+	var yTicks = $(".y-tick");
 	for (var i = 0; i < 6; i++) {
 		var rank = (minRank + i * (maxRank - minRank) / 5);
 		rank = rank === 0 ? 1 : rank;
-		var xTick = $('<div class="x-tick">#' + rank + '</div>');
-		xTick.css("left", plotPadding + plotWidth / 5 * i - 15);
-		$(".x-ticks").append(xTick);
-
-
-
-		var yTick = $('<div class="y-tick">' + currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5)  + '</div>');
+		var xTick = $(xTicks[i])
+		xTick.html("#" + rank);
+		xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
+		
+		var yTick = $(yTicks[i]);
+		yTick.html(currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5));
 		yTick.css("top", plotHeight + plotPadding - plotHeight / 5 * i - 5);
-		$(".y-ticks").append(yTick);
 	}
-	
+
+	haveCreatedTicks = true;
 };
 
 var drawPlot = function(point) {
@@ -491,6 +491,7 @@ var initMinimizeTabs = function() {
 			$(".sidebar").css("margin-left", 0);
 			$(".content").css("left", $(".sidebar").outerWidth());
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
+			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
 		} else {
 			$(".sidebar .change-size").html("+");
 			$(".sidebar .change-size").css("left", 0);
@@ -498,8 +499,13 @@ var initMinimizeTabs = function() {
 			$(".content").css("left", minimizedSize);
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 0);
 		}
+
+		$(".x-ticks").removeClass("quick-transition");
+		$(".x-ticks").css("opacity", 0);
 		setTimeout(function() {
 			update();
+			$(".x-ticks").addClass("quick-transition");
+			$(".x-ticks").css("opacity", 1);
 		}, 500);
 		isSidebarMinimized = !isSidebarMinimized;
 	});
