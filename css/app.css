@@ -89,7 +89,6 @@ a, img {
 .sidebar .description {
 	margin-top: -25px;
 	font-size: 16px;
-	color: #34495e;
 	opacity: .7;
 }
 
@@ -225,7 +224,7 @@ a, img {
 }
 
 .x-axis .label, .y-axis .label {
-	color: #34495e;
+	opacity: .9;
 	font-size: 18px;
 }
 
@@ -269,7 +268,6 @@ a, img {
 
 .x-axis .x-ticks .x-tick, .y-axis .y-ticks .y-tick  {
 	position: absolute;
-	color: #34495e;
 	opacity: .7;
 	font-size: 14px;
 }
