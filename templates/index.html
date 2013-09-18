@@ -12,11 +12,11 @@
 		<div class="global-tooltip tooltip">
 			<h4 class="title"></h4>
 		</div>
-		<div class="sidebar">
-			<h1>BoardGameGeek <span class="inventory-header">Inventory</span></h1>
+		<div class="sidebar no-select">
+			<h1 class="site-title select">BoardGameGeek <span class="inventory-header">Inventory</span></h1>
 
 			<div class="section">
-				<p class="description">A visualization of popular games being sold on <a href="http://boardgamegeek.com" target="_blank">BoardGameGeek.com</a></p>
+				<p class="description select">A visualization of popular games being sold on <a href="http://boardgamegeek.com" target="_blank">BoardGameGeek.com</a></p>
 			</div>
 
 			<div class="section">
@@ -56,12 +56,15 @@
 					</div>
 				</div>
 			</div>
+			<div class="change-size no-select">−</div>
+
 				<!--<div class="links">
 					<a href="https://github.com/zaknelson/bgg-inventory" target="_blank"><img data-tooltip="Code" src="/images/github/github.png"></img></a>
 					<a href="https://www.gittip.com/zaknelson/" target="_blank"><img data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
 					<a href="" class="twitter-link"><img data-tooltip="Tweet" src="/images/twitter/twitter.png"></img></a>
 				</div>-->
 		</div>
+
 		<div class="content">
 			<div class="graph">
 				<canvas class="plot"></canvas>
@@ -81,7 +84,7 @@
 				</div>
 			</div>
 		</div>
-		<script src="/js/jquery-1.8.3.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script src="/js/jquery-ui-1.10.3.custom.min.js"></script>
 		<script src="/js/jquery.ui.touch-punch.min.js"></script>
 		<script src="/js/bootstrap.min.js"></script>
