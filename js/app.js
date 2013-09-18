@@ -153,7 +153,7 @@ var drawAxisLabels = function() {
 		rank = rank === 0 ? 1 : rank;
 		var xTick = $(xTicks[i])
 		xTick.html("#" + rank);
-		xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
+		//xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
 		
 		var yTick = $(yTicks[i]);
 		yTick.html(currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5));
@@ -499,13 +499,11 @@ var initMinimizeTabs = function() {
 			$(".content").css("left", minimizedSize);
 			$(".sidebar .section, .sidebar .site-title").css("opacity", 0);
 		}
-
-		$(".x-ticks").removeClass("quick-transition");
-		$(".x-ticks").css("opacity", 0);
 		setTimeout(function() {
 			update();
-			$(".x-ticks").addClass("quick-transition");
-			$(".x-ticks").css("opacity", 1);
+		}, 250);
+		setTimeout(function() {
+			update();
 		}, 500);
 		isSidebarMinimized = !isSidebarMinimized;
 	});
