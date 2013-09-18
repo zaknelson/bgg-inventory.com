@@ -108,6 +108,7 @@ a, img {
 	display: block;
 	margin: 10px;
 	padding-top: 2px;
+	cursor: pointer;
 }
 
 .conditions .new .checkbox.checked, .conditions .new .checkbox.checked .icons {
