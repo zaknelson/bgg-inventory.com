@@ -224,8 +224,8 @@ a, img {
 }
 
 .x-axis .label, .y-axis .label {
+	color: #34495e;
 	font-size: 18px;
-	opacity: .3;
 }
 
 .y-axis .label {
@@ -236,7 +236,7 @@ a, img {
 }
 
 .x-axis {
-	margin-top: -40px;
+	margin-top: -35px;
 	width: 100%;
 	text-align: center;
 	-moz-box-sizing: border-box;
