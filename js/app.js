@@ -111,8 +111,11 @@ var drawPoint = function(point, color, radius) {
 };
 
 var doesGameContainSubstring = function(game, substring) {
-	var substringParts = substring.toLowerCase().match(/\S+/g);
-	var gameNameParts = game.name.toLowerCase().match(/\S+/g);
+	var substringParts = substring.toLowerCase().trim().match(/\S+/g);
+	var gameNameParts = game.name.toLowerCase().trim().match(/\S+/g);
+	if (!substringParts || !gameNameParts) {
+		return true;
+	}
 	for (var i = 0; i < substringParts.length; i++) {
 		var substringPart = substringParts[i];
 		var foundMatch = false;
