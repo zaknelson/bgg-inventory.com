@@ -1977,13 +1977,15 @@ textarea[class*="span"] {
 .ui-slider-handle[style*='100'] {
   margin-left: -15px;
 }
-.ui-slider-handle:hover,
+.ui-slider-handle:hover{
+  background-color: #667686;
+  outline: none;
+}
 .ui-slider-handle:focus {
-  background-color: #34495e;
   outline: none;
 }
 .ui-slider-handle:active {
-  background-color: #34495e;
+  background-color: #667686;
 }
 .ui-slider-range {
   background-color: #3d556e;
