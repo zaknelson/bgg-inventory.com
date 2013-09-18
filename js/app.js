@@ -153,7 +153,7 @@ var drawAxisLabels = function() {
 		rank = rank === 0 ? 1 : rank;
 		var xTick = $(xTicks[i])
 		xTick.html("#" + rank);
-		//xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
+		xTick.css("left",plotPadding + plotWidth / 5 * i - 15);
 		
 		var yTick = $(yTicks[i]);
 		yTick.html(currencySymbol + (minPrice + i * (maxPrice - minPrice) / 5));
