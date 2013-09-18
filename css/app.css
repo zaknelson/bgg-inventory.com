@@ -40,6 +40,13 @@ a, img {
 	user-select: text;
 }
 
+.quick-transition {
+	-webkit-transition: 0.5s;
+	-moz-transition: 0.5s;
+	-o-transition: 0.5s;
+	transition: 0.5s;
+}
+
 .rotate {
 	-webkit-transform: rotate(-90deg);
 	-moz-transform: rotate(-90deg);
@@ -80,19 +87,6 @@ a, img {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	overflow: auto;
-	opacity: 1;
-	-webkit-transition: 0.5s;
-	-moz-transition: 0.5s;
-	-o-transition: 0.5s;
-	transition: 0.5s;
-}
-
-.sidebar .section {
-	opacity: 1;
-	-webkit-transition: 0.5s;
-	-moz-transition: 0.5s;
-	-o-transition: 0.5s;
-	transition: 0.5s;
 }
 
 .sidebar .inventory-header {
@@ -153,9 +147,6 @@ a, img {
 	line-height: 28px;
 	color: #34495e;
 	text-align: center;
-	-moz-transition: 0.5s;
-	-o-transition: 0.5s;
-	transition: 0.5s;
 }
 
 .sidebar .change-size:hover {
@@ -192,10 +183,6 @@ a, img {
 	float: right;
 	padding: 0px 5px;
 	opacity: .2;
-	-webkit-transition: 0.5s;
-	-moz-transition: 0.5s;
-	-o-transition: 0.5s;
-	transition: 0.5s;
 }
 
 .sidebar .links img:hover {
@@ -216,10 +203,6 @@ a, img {
 	bottom: 0px;
 	left: 300px;
 	overflow: hidden;
-	-webkit-transition: 0.5s;
-	-moz-transition: 0.5s;
-	-o-transition: 0.5s;
-	transition: 0.5s;
 }
 
 .graph {

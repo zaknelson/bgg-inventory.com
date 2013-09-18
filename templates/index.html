@@ -12,23 +12,23 @@
 		<div class="global-tooltip tooltip">
 			<h4 class="title"></h4>
 		</div>
-		<div class="sidebar no-select">
-			<h1 class="site-title select">BoardGameGeek <span class="inventory-header">Inventory</span></h1>
+		<div class="sidebar no-select quick-transition">
+			<h1 class="site-title select quick-transition">BoardGameGeek <span class="inventory-header">Inventory</span></h1>
 
-			<div class="section">
+			<div class="section quick-transition">
 				<p class="description select">A visualization of popular games being sold on <a href="http://boardgamegeek.com" target="_blank">BoardGameGeek.com</a></p>
 			</div>
 
-			<div class="section">
+			<div class="section quick-transition">
 				<input class="search-input" type="text" placeholder="Search..."></input>
 			</div>
 
-			<div class="section">
+			<div class="section quick-transition">
 				<h2>Rank</h2>
 				<div class="rank-slider ui-slider"></div>
 			</div>
 
-			<div class="section">
+			<div class="section quick-transition">
 				<h2>Price</h2>
 				<div class="switch" data-on-label="$" data-off-label="€">
 					<input class="currency-switch" type="checkbox" checked ></input>
@@ -36,7 +36,7 @@
 				<div class="price-slider ui-slider"></div>
 			</div>
 
-			<div class="section">
+			<div class="section quick-transition">
 				<h2>Condition</h2>
 				<div class="conditions">
 					<div class="new">
@@ -56,24 +56,38 @@
 					</div>
 				</div>
 			</div>
-			<div class="change-size no-select">−</div>
+			<div class="change-size no-select quick-transition">−</div>
 
 				<!--<div class="links">
-					<a href="https://github.com/zaknelson/bgg-inventory" target="_blank"><img data-tooltip="Code" src="/images/github/github.png"></img></a>
-					<a href="https://www.gittip.com/zaknelson/" target="_blank"><img data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
-					<a href="" class="twitter-link"><img data-tooltip="Tweet" src="/images/twitter/twitter.png"></img></a>
+					<a href="https://github.com/zaknelson/bgg-inventory" target="_blank"><img class="quick-transition" data-tooltip="Code" src="/images/github/github.png"></img></a>
+					<a href="https://www.gittip.com/zaknelson/" target="_blank"><img class="quick-transition" data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
+					<a href="" class="twitter-link"><img class="quick-transition" data-tooltip="Tweet" src="/images/twitter/twitter.png"></img></a>
 				</div>-->
 		</div>
 
-		<div class="content">
+		<div class="content quick-transition">
 			<div class="graph">
 				<canvas class="plot"></canvas>
 				<div class="x-axis">
-					<div class="x-ticks"></div>
+					<div class="x-ticks">
+						<div class="x-tick"></div>
+						<div class="x-tick"></div>
+						<div class="x-tick"></div>
+						<div class="x-tick"></div>
+						<div class="x-tick"></div>
+						<div class="x-tick"></div>
+					</div>
 					<h3 class="label">Rank</h3>
 				</div>
 				<div class="y-axis">
-					<div class="y-ticks"></div>
+					<div class="y-ticks">
+						<div class="y-tick"></div>
+						<div class="y-tick"></div>
+						<div class="y-tick"></div>
+						<div class="y-tick"></div>
+						<div class="y-tick"></div>
+						<div class="y-tick"></div>
+					</div>
 					<h3 class="label rotate">Price</h3>
 				</div>
 				<div class="tooltip">
@@ -83,6 +97,10 @@
 					<p class="prices"></p>
 				</div>
 			</div>
+		</div>
+
+		<div class="right-sidebar">
+			
 		</div>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script src="/js/jquery-ui-1.10.3.custom.min.js"></script>
