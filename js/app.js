@@ -481,12 +481,32 @@ var initSidebar = function() {
 	});
 };
 
+var initMinimizeTabs = function() {
+	var isSidebarMinimized = false;
+	var minimizedSize = 50;
+	$(".sidebar .change-size").click(function() {
+		if (isSidebarMinimized) {
+			$(".sidebar .change-size").html("−");
+			$(".sidebar").css("margin-left", 0);
+			$(".content").css("left", $(".sidebar").outerWidth());
+			$(".sidebar .section, .sidebar .site-title").show();
+		} else {
+			$(".sidebar .change-size").html("+");
+			$(".sidebar").css("margin-left", -$(".sidebar").outerWidth() + minimizedSize);
+			$(".content").css("left", minimizedSize);
+			$(".sidebar .section, .sidebar .site-title").hide();
+		}
+		isSidebarMinimized = !isSidebarMinimized;
+	});
+};
+
 var main = function() {
 	initGames();
 	initSidebar();
 	initPlot();
 	initWindowResizeHandler();
 	initKeyHandlers();
+	initMinimizeTabs();
 };
 
 main();

@@ -22,6 +22,24 @@ a, img {
 	border:none;
 }
 
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.select {
+	-webkit-touch-callout: text;
+	-webkit-user-select: text;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+}
+
 .rotate {
 	-webkit-transform: rotate(-90deg);
 	-moz-transform: rotate(-90deg);
@@ -54,7 +72,7 @@ a, img {
 
 .sidebar {
 	position: absolute;;
-	min-height: 100px;
+	min-height: 100%;
 	height: 100%;
 	width: 300px;
 	padding: 0px 10px;
@@ -108,6 +126,26 @@ a, img {
 	display: block;
 	margin: 10px;
 	padding-top: 2px;
+	cursor: pointer;
+}
+
+.sidebar .change-size {
+	position: absolute;
+	padding: 5px;
+	bottom: 0px;
+	right: 12px;
+	font-weight: bold;
+	font-size: 28px;
+	line-height: 28px;
+	color: #d7d7d7;
+	-webkit-transition: 0.5s;
+	-moz-transition: 0.5s;
+	-o-transition: 0.5s;
+	transition: 0.5s;
+}
+
+.sidebar .change-size:hover {
+	color: #16a085;
 	cursor: pointer;
 }
 
