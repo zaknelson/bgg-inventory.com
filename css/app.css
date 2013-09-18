@@ -80,6 +80,19 @@ a, img {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	overflow: auto;
+	opacity: 1;
+	-webkit-transition: 0.5s;
+	-moz-transition: 0.5s;
+	-o-transition: 0.5s;
+	transition: 0.5s;
+}
+
+.sidebar .section {
+	opacity: 1;
+	-webkit-transition: 0.5s;
+	-moz-transition: 0.5s;
+	-o-transition: 0.5s;
+	transition: 0.5s;
 }
 
 .sidebar .inventory-header {
@@ -130,15 +143,16 @@ a, img {
 }
 
 .sidebar .change-size {
-	position: absolute;
+	position: fixed;
+	width: 40px;
 	padding: 5px;
 	bottom: 0px;
-	right: 12px;
+	left: 250px;
 	font-weight: bold;
 	font-size: 28px;
 	line-height: 28px;
 	color: #34495e;
-	-webkit-transition: 0.5s;
+	text-align: center;
 	-moz-transition: 0.5s;
 	-o-transition: 0.5s;
 	transition: 0.5s;
@@ -202,6 +216,10 @@ a, img {
 	bottom: 0px;
 	left: 300px;
 	overflow: hidden;
+	-webkit-transition: 0.5s;
+	-moz-transition: 0.5s;
+	-o-transition: 0.5s;
+	transition: 0.5s;
 }
 
 .graph {

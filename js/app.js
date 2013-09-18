@@ -487,15 +487,20 @@ var initMinimizeTabs = function() {
 	$(".sidebar .change-size").click(function() {
 		if (isSidebarMinimized) {
 			$(".sidebar .change-size").html("−");
+			$(".sidebar .change-size").css("left", $(".sidebar").outerWidth() - 50);
 			$(".sidebar").css("margin-left", 0);
 			$(".content").css("left", $(".sidebar").outerWidth());
-			$(".sidebar .section, .sidebar .site-title").show();
+			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
 		} else {
 			$(".sidebar .change-size").html("+");
+			$(".sidebar .change-size").css("left", 0);
 			$(".sidebar").css("margin-left", -$(".sidebar").outerWidth() + minimizedSize);
 			$(".content").css("left", minimizedSize);
-			$(".sidebar .section, .sidebar .site-title").hide();
+			$(".sidebar .section, .sidebar .site-title").css("opacity", 0);
 		}
+		setTimeout(function() {
+			update();
+		}, 500);
 		isSidebarMinimized = !isSidebarMinimized;
 	});
 };
