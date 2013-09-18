@@ -61,7 +61,7 @@ class Game < JSONable
 		game.categories = []
 		xml.css("marketplacelistings > listing").each do |listing|
 			market_item = MarketItem.parse_market_item_from_xml(listing)
-			game.market_items.push(market_item)
+			game.market_items.push(market_item) if market_item
 		end
 		xml.css('link[type="boardgamecategory"]').each do |category|
 			game.categories.push(category.attr("value"));
