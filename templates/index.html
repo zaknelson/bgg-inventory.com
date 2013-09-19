@@ -13,56 +13,57 @@
 			<h4 class="title"></h4>
 		</div>
 		<div class="sidebar no-select quick-transition">
-			<h1 class="site-title select quick-transition">BoardGameGeek <span class="inventory-header">Inventory</span></h1>
+			<div>
+				<h1 class="site-title select quick-transition">BoardGameGeek <span class="inventory-header">Inventory</span></h1>
 
-			<div class="section quick-transition">
-				<p class="description select">A visualization of popular games being sold on <a href="http://boardgamegeek.com" target="_blank">BoardGameGeek.com</a></p>
-			</div>
-
-			<div class="section quick-transition">
-				<input class="search-input" type="text" placeholder="Search..."></input>
-			</div>
-
-			<div class="section quick-transition">
-				<h2>Rank</h2>
-				<div class="rank-slider ui-slider"></div>
-			</div>
-
-			<div class="section quick-transition">
-				<h2>Price</h2>
-				<div class="switch" data-on-label="$" data-off-label="€">
-					<input class="currency-switch" type="checkbox" checked ></input>
+				<div class="section quick-transition">
+					<p class="description select">A visualization of highly ranked games being sold on <a href="http://boardgamegeek.com" target="_blank">BoardGameGeek.com</a>.</p>
 				</div>
-				<div class="price-slider ui-slider"></div>
-			</div>
 
-			<div class="section quick-transition">
-				<h2>Condition</h2>
-				<div class="conditions">
-					<div class="new">
-						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>New</label>
+				<div class="section quick-transition">
+					<input class="search-input" type="text" placeholder="Search..."></input>
+				</div>
+
+				<div class="section quick-transition">
+					<h2>Rank</h2>
+					<div class="rank-slider ui-slider"></div>
+				</div>
+
+				<div class="section quick-transition">
+					<h2>Price</h2>
+					<div class="switch" data-on-label="$" data-off-label="€">
+						<input class="currency-switch" type="checkbox" checked ></input>
 					</div>
-					<div class="like-new">
-						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Like New</label>
-					</div>
-					<div class="very-good">
-						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Very Good</label>
-					</div>
-					<div class="good">
-						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Good</label>
-					</div>
-					<div class="acceptable">
-						<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Acceptable</label>
+					<div class="price-slider ui-slider"></div>
+				</div>
+
+				<div class="section quick-transition">
+					<h2>Condition</h2>
+					<div class="conditions">
+						<div class="new">
+							<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>New</label>
+						</div>
+						<div class="like-new">
+							<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Like New</label>
+						</div>
+						<div class="very-good">
+							<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Very Good</label>
+						</div>
+						<div class="good">
+							<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Good</label>
+						</div>
+						<div class="acceptable">
+							<label class="checkbox checked"><input type="checkbox" checked="checked" data-toggle="checkbox"></input>Acceptable</label>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="change-size no-select quick-transition">−</div>
-
-				<!--<div class="links">
-					<a href="https://github.com/zaknelson/bgg-inventory" target="_blank"><img class="quick-transition" data-tooltip="Code" src="/images/github/github.png"></img></a>
-					<a href="https://www.gittip.com/zaknelson/" target="_blank"><img class="quick-transition" data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
+				<div class="change-size"></div>
+				<div class="links">
 					<a href="" class="twitter-link"><img class="quick-transition" data-tooltip="Tweet" src="/images/twitter/twitter.png"></img></a>
-				</div>-->
+					<a href="https://www.gittip.com/zaknelson/" target="_blank"><img class="quick-transition" data-tooltip="Donate" src="/images/gittip/gittip.png"></img></a>
+					<a href="https://github.com/zaknelson/bgg-inventory" target="_blank"><img class="quick-transition" data-tooltip="Code" src="/images/github/github.png"></img></a>
+				</div>
+			</div>
 		</div>
 
 		<div class="content quick-transition">
@@ -99,8 +100,13 @@
 			</div>
 		</div>
 
-		<div class="right-sidebar">
-			
+		<div class="right-sidebar quick-transition">
+			<div class="section">
+				<h2 class="result-count no-select"></h2>
+				<table class="result-table">
+				</table>
+			</div>
+			<div class="change-size"></div>
 		</div>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script src="/js/jquery-ui-1.10.3.custom.min.js"></script>

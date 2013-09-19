@@ -1,3 +1,6 @@
+// Refactor. This is sloppy beyond belief.
+
+
 var plot = $(".plot");
 var plotContext = plot[0].getContext("2d");
 
@@ -16,13 +19,14 @@ var plotWidth = 500;
 var plotHeight = 500;
 var lastPoint = null;
 var isMinimizing = false;
+var isFilterChanging = false;
 
 // filters
 var searchQuery = null;
 var minPrice = 0;
 var maxPrice = 50;
 var minRank = 0;
-var maxRank = 100;
+var maxRank = 50;
 var currency = "USD";
 var currencySymbol = "$";
 var conditions = {"new": true, "likenew": true, "verygood": true, "good": true, "acceptable": true};
@@ -82,21 +86,22 @@ var marketItemToPoint = function(game, marketItem) {
 
 var conditionToColor = function(condition, isBright) {
 	var color = null;
+	var opacity = !clickedGame ? 1 : .3;
 	switch(condition) {
 		case "new":
-			color = isBright ? "rgba(52, 73, 94, 1)" : "#b7bfc6";
+			color = isBright ? "rgba(52, 73, 94, 1)" : "rgba(183, 191, 198, " + opacity + ")" ;
 			break;
 		case "likenew":
-			color = isBright ? "rgba(52, 152, 219, 1)" : "#b7dbf2"
+			color = isBright ? "rgba(52, 152, 219, 1)" : "rgba(183, 219, 242, " + opacity + ")" ;
 			break;
 		case "verygood":
-			color = isBright ? "rgba(46, 204, 113, 1)" : "#b5edcd";
+			color = isBright ? "rgba(46, 204, 113, 1)" : "rgba(181, 237, 205, " + opacity + ")" ;
 			break;
 		case "good":
-			color = isBright ? "rgba(241, 196, 15, 1)" : "#f7e28d";
+			color = isBright ? "rgba(241, 196, 15, 1)" : "rgba(247, 226, 141, " + opacity + ")" ;
 			break;
 		case "acceptable":
-			color = isBright ? "rgba(231, 76, 60, 1)" : "#f7c0ba";
+			color = isBright ? "rgba(231, 76, 60, 1)" : "rgba(247, 192, 186, " + opacity + ")" ;
 			break;
 		default:
 			break;
@@ -162,17 +167,24 @@ var drawAxisLabels = function(width) {
 	}
 };
 
-var drawPlot = function(point) {
+var doUpdate = function(point) {
 	drawAxisLabels();
 	plot.attr("width", plot.width());
 	plot.attr("height", plot.height());
 	plotContext.clearRect (0, 0, plot.width(), plot.height());
 	var drawLater = [];
+	var filteredGames = [];
+	if (isFilterChanging) {
+		$(".result-table").empty();
+	}
+		
 	for (var i = 0; i < games.length; i++) {
 		var game = games[i];
+		var isGameFiltered = false;
 		for (var j = 0; j < game.market_items.length; j++) {
 			var marketItem = game.market_items[j];
 			if (isFiltered(game, marketItem)) {
+				isGameFiltered = true;
 				var marketItemPoint = marketItemToPoint(game, marketItem);
 				if (mousedOverGame) { // one game is moused over, display it only
 					var isSelected = mousedOverGame === game;
@@ -193,6 +205,29 @@ var drawPlot = function(point) {
 					drawPoint(marketItemPoint, color, pointRadius);
 				}
 			}
+		}
+
+		if (isFilterChanging && isGameFiltered) {
+			filteredGames.push(game);
+		}
+	}
+
+	if (isFilterChanging) {
+		filteredGames.sort(function(a, b) {
+			if (a.name[0] < b.name[0]) return -1;
+			if (a.name[0] > b.name[0]) return 1;
+			return 0;
+		});
+		$(".result-count").html("Found " + filteredGames.length + " games");
+		for (var i = 0; i < filteredGames.length; i++) {
+			var game = filteredGames[i];
+			var row = $("<tr><td data-game-rank='" + game.rank +"'><div class='name-column no-select'>" + game.name + "</div></td></tr>");
+			row.click(function() {
+				var rank = $(this).find("td").attr("data-game-rank");
+				var clickedGame = games[parseInt(rank) - 1];
+				makeGameActive(clickedGame);
+			});
+			$(".result-table").append(row);
 		}
 	}
 
@@ -262,10 +297,15 @@ var showPlotTooltip = function(point, touch) {
 		if (touch) {
 			tooltip.css("top", plot.height() / 5 + "px");
 		} else {
-			tooltip.css("top", Math.min(point.y + 20, plot.height() - tooltip.height() - 40) + "px");
+			tooltip.css("top", Math.min(point.y, plot.height() - tooltip.height() - 40) + "px");
 		}
 		
-		tooltip.css("left", Math.min(plot.width() - 400 - 35, point.x + 20) + "px");
+		var defaultLeft = point.x + 20 + pointRadius*2;
+		var maxLeft = plot.width() - parseInt(tooltip.find("p").css("max-width")) - 10;
+		tooltip.css("left", Math.min(maxLeft, defaultLeft) + "px");
+		if (defaultLeft > maxLeft) {
+			tooltip.css("left", Math.max(point.x - 30 - pointRadius*2 - tooltip.width(), 10) + "px");
+		}
 		tooltip.show();
 	} else {
 		tooltip.hide();
@@ -286,13 +326,19 @@ var update = function(point, touch) {
 		showPlotTooltip(point, touch);
 	}
 
-	drawPlot(point);
+	doUpdate(point);
 };
+
+var updateBecauseOfFilterChange = function() {
+	isFilterChanging = true;
+	update();
+	isFilterChanging = false;
+}
 
 var initGames = function() {
 	$.getJSON("/api/v1/games", function(data) {
 		games = data;
-		update();
+		updateBecauseOfFilterChange();
 	});
 };
 
@@ -304,6 +350,14 @@ var initWindowResizeHandler = function() {
 			update();
 		}, 50);
 	};
+};
+
+var makeGameActive = function(game) {
+	mousedOverGame = game;
+	clickedGame = game;
+	var point = marketItemToPoint(game, game.market_items[0]);
+	point.y = plotHeight / 2 - 100;
+	update(point);
 };
 
 var initKeyHandlers = function() {
@@ -318,11 +372,7 @@ var initKeyHandlers = function() {
 			while (i !== startingIndex && !done) {
 				var game = games[i];
 				if (getFilteredMarketItems(game).length) {
-					mousedOverGame = game;
-					clickedGame = game;
-					var point = marketItemToPoint(game, game.market_items[0]);
-					point.y = lastPoint.y;
-					update(point);
+					makeGameActive(game);
 					done = true;
 					break;
 				}
@@ -340,11 +390,7 @@ var initKeyHandlers = function() {
 				for (var j = 0; j < game.market_items.length; j++) {
 					var marketItem = game.market_items[j];
 					if (getFilteredMarketItems(game).length) {
-						mousedOverGame = game;
-						clickedGame = game;
-						var point = marketItemToPoint(game, game.market_items[0]);
-						point.y = lastPoint.y;
-						update(point);
+						makeGameActive(game);
 						done = true;
 						break;
 					}
@@ -401,7 +447,7 @@ var initSidebar = function() {
 
 	$(".search-input").keyup(function() {
 		searchQuery = $(".search-input").val();
-		update();
+		updateBecauseOfFilterChange();
 	});
 
 	$('.conditions input[type="checkbox"]').change(function(event) {
@@ -410,13 +456,13 @@ var initSidebar = function() {
 		$('.conditions .very-good input').is(":checked") ? 		conditions["verygood"] = true : 	conditions["verygood"] = false;
 		$('.conditions .good input').is(":checked") ? 			conditions["good"] = true : 		conditions["good"] = false;
 		$('.conditions .acceptable input').is(":checked") ?	 	conditions["acceptable"] = true : 	conditions["acceptable"] = false;
-		update();
+		updateBecauseOfFilterChange();
 	});
 
 	$(".currency-switch").change(function(event) {
 		currency = $(".currency-switch").is(":checked") ? "USD" : "EUR";
 		currencySymbol = currency === "USD" ? "$" : "€";
-		update();
+		updateBecauseOfFilterChange();
 	});
 
 	var showSliderTooltip = function(slider, str, value, maxValue) {
@@ -445,7 +491,7 @@ var initSidebar = function() {
 			showSliderTooltip(priceSlider, currencySymbol + (ui.value), ui.value, 200);
 			minPrice = ui.values[0];
 			maxPrice = ui.values[1];
-			update();
+			updateBecauseOfFilterChange();
 		},
 		start: function(event, ui) {
 			showSliderTooltip(priceSlider, currencySymbol + ui.value, ui.value, 200)
@@ -457,7 +503,7 @@ var initSidebar = function() {
 	rankSlider.slider({
 		min: 0,
 		max: 500,
-		values: [0, 100],
+		values: [0, 50],
 		step: 50,
 		orientation: "horizontal",
 		range: true,
@@ -468,7 +514,7 @@ var initSidebar = function() {
 			showSliderTooltip(rankSlider, "#" + (ui.value === 0 ? 1 : ui.value), ui.value, 500);
 			minRank = ui.values[0];
 			maxRank = ui.values[1];
-			update();
+			updateBecauseOfFilterChange();
 		},
 		start: function(event, ui) {
 			showSliderTooltip(rankSlider, "#" + (ui.value === 0 ? 1 : ui.value), ui.value, 500);
@@ -483,44 +529,71 @@ var initSidebar = function() {
 };
 
 var initMinimizeTabs = function() {
-	var isSidebarMinimized = false;
-	var minimizedSize = 50;
 	$(".sidebar .change-size").click(function() {
-		
-		if (isSidebarMinimized) {
-			$(".sidebar .change-size").html("−");
-			$(".sidebar .change-size").css("left", $(".sidebar").outerWidth() - 50);
+		var minimizedSize = $(".sidebar .change-size").width();
+		if ($(".sidebar").hasClass("minimized")) {
 			$(".sidebar").css("margin-left", 0);
+			$(".sidebar").css("overflow-y", "auto");
+			$(".sidebar .section").show();
 			$(".content").css("left", $(".sidebar").outerWidth());
-			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
-			$(".sidebar .section, .sidebar .site-title").css("opacity", 1);
-			drawAxisLabels(plotWidth - $(".sidebar").outerWidth() + 50);
+			drawAxisLabels(plotWidth - $(".sidebar").outerWidth() + minimizedSize);
 		} else {
-			$(".sidebar .change-size").html("+");
-			$(".sidebar .change-size").css("left", 0);
+			var minimizedSize = $(".sidebar .change-size").width();
 			$(".sidebar").css("margin-left", -$(".sidebar").outerWidth() + minimizedSize);
 			$(".content").css("left", minimizedSize);
-			$(".sidebar .section, .sidebar .site-title").css("opacity", 0);
 			$(".x-tick").addClass("quick-transition");
-			drawAxisLabels(plotWidth + $(".sidebar").outerWidth() - 50);
+			$(".sidebar").css("overflow-y", "hidden");
+			drawAxisLabels(plotWidth + $(".sidebar").outerWidth() - minimizedSize);
 		}
 		isMinimizing = true;
-		
-
-		//$(".x-tick").removeClass("quick-transition");
-		//$(".x-tick").css("opacity", 0);
+		setTimeout(function() { update(); }, 250);
 		setTimeout(function() {
+			if ($(".sidebar").hasClass("minimized")) {
+				$(".sidebar .section").hide();
+			}
 			update();
-		}, 250);
-		setTimeout(function() {
-			update();
-			//$(".x-tick").addClass("quick-transition");
-			//$(".x-tick").css("opacity", .7);
 			isMinimizing = false;
 		}, 500);
-		isSidebarMinimized = !isSidebarMinimized;
+		if ($(".sidebar").hasClass("minimized")) {
+			$(".sidebar").removeClass("minimized")
+		} else {
+			$(".sidebar").addClass("minimized");
+		}
+	});
+
+	$(".right-sidebar .change-size").click(function() {
+		var minimizedSize = $(".right-sidebar .change-size").width();
+		if ($(".right-sidebar").hasClass("minimized")) {
+			$(".right-sidebar").css("margin-right", 0);
+			$(".right-sidebar").css("overflow-y", "auto");
+			$(".content").css("right", $(".right-sidebar").outerWidth());
+			drawAxisLabels(plotWidth - $(".right-sidebar").outerWidth() + minimizedSize);
+		} else {
+			$(".right-sidebar").css("margin-right", -$(".right-sidebar").outerWidth() + minimizedSize);
+			$(".content").css("right", minimizedSize);
+			$(".x-tick").addClass("quick-transition");
+			$(".right-sidebar").css("overflow-y", "hidden");
+			drawAxisLabels(plotWidth + $(".right-sidebar").outerWidth() - minimizedSize);
+		}
+		isMinimizing = true;
+		setTimeout(function() { update(); }, 250);
+		setTimeout(function() {
+			update();
+			isMinimizing = false;
+		}, 500);
+		if ($(".right-sidebar").hasClass("minimized")) {
+			$(".right-sidebar").removeClass("minimized")
+		} else {
+			$(".right-sidebar").addClass("minimized");
+		}
 	});
 };
+
+var handleSmallInitialScreen = function() {
+	//if ($(window).width() < 1300) {
+		//$(".right-sidebar .change-size").trigger("click");
+	//}
+}
 
 var main = function() {
 	initGames();
@@ -529,6 +602,7 @@ var main = function() {
 	initWindowResizeHandler();
 	initKeyHandlers();
 	initMinimizeTabs();
+	handleSmallInitialScreen();
 };
 
 main();

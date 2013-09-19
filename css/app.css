@@ -66,7 +66,11 @@ a, img {
 .tooltip .title {
 	margin: 0px;
 	margin-top: 3px;
-	max-width: 400px;
+	max-width: 300px;
+}
+
+.section {
+	margin-top: 30px;
 }
 
 
@@ -86,7 +90,8 @@ a, img {
 	border-right: 1px #ccc solid;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .sidebar .inventory-header {
@@ -97,6 +102,20 @@ a, img {
 	margin-top: -25px;
 	font-size: 16px;
 	opacity: .7;
+}
+
+.sidebar .links {
+	margin-left: 75px;
+}
+
+.sidebar .links img {
+	width: 36px;
+	padding: 0px 2px;
+	opacity: .2;
+}
+
+.sidebar .links img:hover {
+	opacity: 1.0;
 }
 
 .sidebar .search-input {
@@ -137,20 +156,15 @@ a, img {
 }
 
 .sidebar .change-size {
-	position: fixed;
-	width: 40px;
-	padding: 5px;
+	position: absolute;
+	width: 20px;
+	top: 0px;
 	bottom: 0px;
-	left: 250px;
-	font-weight: bold;
-	font-size: 28px;
-	line-height: 28px;
-	color: #34495e;
-	text-align: center;
+	left: 280px;
 }
 
-.sidebar .change-size:hover {
-	color: #16a085;
+.change-size:hover {
+	background-color: #f4f4f4;
 	cursor: pointer;
 }
 
@@ -170,25 +184,6 @@ a, img {
 	color: #e74c3c;
 }
 
-.sidebar .section {
-	margin-top: 30px;
-}
-
-.sidebar .links {
-	position: absolute;
-}
-
-.sidebar .links img {
-	width: 32px;
-	float: right;
-	padding: 0px 5px;
-	opacity: .2;
-}
-
-.sidebar .links img:hover {
-	opacity: 1.0;
-}
-
 
 /*
  *
@@ -199,7 +194,7 @@ a, img {
 .content {
 	position: absolute;
 	top: 0px;
-	right: 0px;
+	right: 250px;
 	bottom: 0px;
 	left: 300px;
 	overflow: hidden;
@@ -276,7 +271,7 @@ a, img {
 .content .tooltip p {
 	margin: 2px 0px;
 	color: #444;
-	max-width: 400px;
+	max-width: 300px;
 }
 
 .content .tooltip .current-prices-text {
@@ -289,4 +284,56 @@ a, img {
 	margin-left: 10px;
 	font-weight: bold;
 	font-size: 16px;
+}
+
+
+
+/*
+ *
+ * Right sidebar
+ *
+*/
+
+.right-sidebar {
+	position: absolute;
+	width: 250px;
+	height: 100%;
+	right: 0px;
+	border-left: 1px #ccc solid;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding: 10px 18px;
+}
+
+.right-sidebar .change-size {
+	position: absolute;
+	width: 20px;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+}
+
+.right-sidebar .section {
+	margin-top: -10px;
+}
+
+.right-sidebar .result-table .name-column {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-size: 14px;
+	color: #444;
+	opacity: .9;
+	width: 200px;
+	overflow: hidden;
+}
+
+.right-sidebar .result-count {
+	margin-bottom: 5px;
+}
+
+.right-sidebar .result-table .name-column:hover {
+	color: #16a085;
+	cursor: pointer;
 }
