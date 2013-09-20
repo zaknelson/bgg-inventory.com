@@ -1,6 +1,10 @@
 // Refactor. This is sloppy beyond belief.
 
 
+var getURLParameter = function(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+};
+
 var plot = $(".plot");
 var plotContext = plot[0].getContext("2d");
 
@@ -20,6 +24,7 @@ var plotHeight = 500;
 var lastPoint = null;
 var isMinimizing = false;
 var isFilterChanging = false;
+var isShowingCurrencySymbol = getURLParameter("currencySymbol") === "true";
 
 // filters
 var searchQuery = null;
@@ -267,7 +272,7 @@ var updateTooltipPrices = function(tooltip) {
 			var marketItem = marketItemsForCondition[j];
 			var separator = j !== marketItemsForCondition.length - 1 ? ", " : "";
 			var color = conditionToColor(marketItem.condition, true);
-			var link = $('<a style="color:' + color + '" href="' + marketItem.link + '" target="_blank">' + Math.round(marketItem.price.value) + "</a>");
+			var link = $('<a style="color:' + color + '" href="' + marketItem.link + '" target="_blank">' + (isShowingCurrencySymbol ? currencySymbol : "") + Math.round(marketItem.price.value) + "</a>");
 			var span = $('<span style="color:' + color + '"></span>');
 			span.append(link);
 			span.append(separator);
@@ -590,12 +595,6 @@ var initMinimizeTabs = function() {
 	});
 };
 
-var handleSmallInitialScreen = function() {
-	//if ($(window).width() < 1300) {
-		//$(".right-sidebar .change-size").trigger("click");
-	//}
-}
-
 var main = function() {
 	initGames();
 	initSidebar();
@@ -603,7 +602,6 @@ var main = function() {
 	initWindowResizeHandler();
 	initKeyHandlers();
 	initMinimizeTabs();
-	handleSmallInitialScreen();
 };
 
 main();
