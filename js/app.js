@@ -222,10 +222,11 @@ var doUpdate = function(point) {
 		for (var i = 0; i < filteredGames.length; i++) {
 			var game = filteredGames[i];
 			var row = $("<tr><td data-game-rank='" + game.rank +"'><div class='name-column no-select'>" + game.name + "</div></td></tr>");
-			row.click(function() {
+			row.click(function(event) {
 				var rank = $(this).find("td").attr("data-game-rank");
 				var clickedGame = games[parseInt(rank) - 1];
 				makeGameActive(clickedGame);
+				event.stopPropagation();
 			});
 			$(".result-table").append(row);
 		}
@@ -421,7 +422,7 @@ var initPlot = function() {
 		event.preventDefault();
 	});
 
-	$(".sidebar").click(function(event) {
+	$(".sidebar, .right-sidebar").click(function(event) {
 		if (clickedGame) {
 			clickedGame = null;
 			update();
