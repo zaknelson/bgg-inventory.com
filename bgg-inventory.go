@@ -69,7 +69,7 @@ func UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	finishedTimeAgo := time.Now().Sub(finishedInfo.ModTime())
 
 	if  lastStartedErr == nil && finishedErr == nil && 
-		startedTimeAgo.Minutes() > 20 && finishedTimeAgo.Hours() > 24 {
+		startedTimeAgo.Minutes() > 20 && finishedTimeAgo.Hours() > 8 {
 		go func() {
 			ioutil.WriteFile("model/started.txt", nil, 0644)
 			command := exec.Command("ruby", "bgg-inventory-scraper.rb")
