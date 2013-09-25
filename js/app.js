@@ -530,7 +530,7 @@ var initSidebar = function() {
 		}});
 
 	$(".twitter-link").click(function() {
-		window.open("https://twitter.com/intent/tweet?text=bgg-inventory.com - A visualization of popular games being sold on BoardGameGeek, by @_zaknelson", "", "height=400,width=600");
+		window.open("https://twitter.com/intent/tweet?text=bgg-inventory.com - A visualization of popular games being sold on @boardgamegeek, by @_zaknelson", "", "height=400,width=600");
 	});
 };
 
