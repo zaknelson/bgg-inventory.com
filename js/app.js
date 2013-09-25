@@ -342,7 +342,7 @@ var updateBecauseOfFilterChange = function() {
 }
 
 var initGames = function() {
-	$.getJSON("/api/v1/games", function(data) {
+	$.getJSON("http://api.bgg-inventory/api/v1/games.json", function(data) {
 		games = data;
 		updateBecauseOfFilterChange();
 	});
